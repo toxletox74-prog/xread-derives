@@ -296,6 +296,10 @@ tr.eclair td { animation: eclair 1.6s ease-out; }
 .banniere.info { background: var(--bleu-pale); border-color: var(--mod-bord); color: var(--mod-texte); }
 .banniere.attention { background: var(--attente-fond); border-color: var(--attente-bord); color: var(--attente-texte); }
 .banniere.ok { background: var(--ok-fond); border-color: var(--ok-bord); color: var(--ok-texte); }
+.banniere.cliquable { cursor: pointer; } .banniere.cliquable:hover { filter: brightness(1.08); }
+.banniere > .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.carte.eclair { animation: eclair-carte 2s ease-out; }
+@keyframes eclair-carte { from { box-shadow: 0 0 0 3px var(--bleu); } to { box-shadow: 0 0 0 3px transparent; } }
 .toasts { position: fixed; right: var(--e4); bottom: var(--e4); display: flex; flex-direction: column; gap: var(--e2); z-index: 1000;
   max-width: min(420px, calc(100vw - 32px)); }
 .toast { background: var(--nuit); color: #fff; padding: var(--e3) var(--e4); border-radius: 10px; box-shadow: 0 6px 24px rgba(11, 22, 38, .3);
