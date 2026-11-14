@@ -218,13 +218,41 @@ def nom_pas(pas):
     return NOMS_PAS.get(int(pas), f"toutes les {int(pas)} min")
 
 
-def couverture(compteurs, regles, libelles=None):
+# Fluides sans règle de dérive propre : ce que Vigie fait quand même de leurs relevés
+USAGE_SANS_REGLE = {
+    "electricite_injection": "Il sert à vérifier que l'injection au réseau suit la production solaire (injection nulle "
+                             "alors que les panneaux produisent : défaut de comptage signalé).",
+    "electricite_sous_compteur": "Sa consommation fait partie de celle du compteur principal d'électricité de "
+                                 "l'immeuble.",
+}
+
+
+def explication(fluide, pas, regles):
+    """Pourquoi aucune règle active ne surveille un compteur de ce fluide relevé à ce pas (texte affiché)."""
+    du_fluide = [r for r in regles if r["fluide_point"] == fluide]
+    if not du_fluide:
+        texte = "Aucune règle de dérive n'existe pour ce fluide."
+    else:
+        dehors = [r for r in du_fluide if not PAS_REGLES[r["id"]][0] <= pas <= PAS_REGLES[r["id"]][1]]
+        coupees = [r for r in du_fluide if r not in dehors]  # au bon pas, donc désactivées
+        texte = " ".join(
+            [f"« {r['libelle']} » s'appliquerait à ce relevé, mais elle est désactivée dans l'écran Règles." for r in coupees]
+            + [f"« {r['libelle']} » exige un relevé {RELEVES[PAS_REGLES[r['id']]]}." for r in dehors])
+        if dehors and not coupees:
+            texte = f"Relevé {nom_pas(pas)} inadapté : " + texte
+    usage = USAGE_SANS_REGLE.get(fluide)
+    return f"{texte} {usage or ''} Seule la qualité de ses données est contrôlée (compteur muet, lacunes, index qui " \
+           f"recule).".replace("  ", " ")
+
+
+def couverture(compteurs, regles, libelles=None, points=()):
     """Alerte de couverture du parc : une règle active qui ne correspond pas à la granularité de tous les compteurs
     de son fluide, et les compteurs qu'aucune règle active ne surveille.
 
     `compteurs` : [(fluide, pas en minutes, nombre de compteurs actifs)] ; `regles` : règles effectives (id, active,
     libelle, fluide_point) ; `libelles` : {fluide: nom affiché}. Niveaux : « sans_effet » (la règle ne tourne sur
-    aucun compteur du fluide), « partielle » (une partie seulement), puis la liste des compteurs sans règle."""
+    aucun compteur du fluide), « partielle » (une partie seulement), puis la liste des compteurs sans règle.
+    `points` : [(id, immeuble, libellé, fluide, pas)] des compteurs actifs, pour détailler chaque compteur sans règle."""
     alertes, couverts = [], set()
     for r in regles:
         if not r["active"]:
@@ -245,9 +273,14 @@ def couverture(compteurs, regles, libelles=None):
             texte = (f"« {r['libelle']} » tourne sur {sum(n for _pas, n in au_pas)} compteur(s) sur {total} : les "
                      f"autres ({detail}) ne sont pas relevés {RELEVES[(fin, grossier)]}.")
         alertes.append({"niveau": "partielle" if au_pas else "sans_effet", "regle": r["id"], "texte": texte})
-    sans = [{"fluide": (libelles or {}).get(fl, fl), "pas": nom_pas(pas), "compteurs": n}
-            for fl, pas, n in sorted(compteurs) if fl not in AUXILIAIRES and (fl, pas) not in couverts]
+    sans_cles = [(fl, pas, n) for fl, pas, n in sorted(compteurs) if fl not in AUXILIAIRES and (fl, pas) not in couverts]
+    sans = [{"fluide": (libelles or {}).get(fl, fl), "pas": nom_pas(pas), "compteurs": n} for fl, pas, n in sans_cles]
+    raisons = {(fl, pas): explication(fl, pas, regles) for fl, pas, _n in sans_cles}
+    detail = [{"id": pid, "immeuble": im, "libelle": lib, "fluide": (libelles or {}).get(fl, fl), "pas": nom_pas(pas),
+               "explication": raisons[(fl, pas)]} for pid, im, lib, fl, pas in sorted(points, key=lambda p: (p[1] or "", p[0]))
+              if (fl, pas) in raisons]
     return {"alertes": sorted(alertes, key=lambda a: a["niveau"] != "sans_effet"), "sans_regle": sans,
+            "compteurs_detail": detail,
             "sans_effet": sum(a["niveau"] == "sans_effet" for a in alertes),
             "partielles": sum(a["niveau"] == "partielle" for a in alertes),
             "compteurs_sans_regle": sum(s["compteurs"] for s in sans)}

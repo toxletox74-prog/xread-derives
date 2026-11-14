@@ -40,14 +40,11 @@ export async function pageTableau(main, ctx) {
   }
   const c = e.couverture || {};
   if ((c.sans_effet || c.compteurs_sans_regle) && !couvertureVue(c)) {
-    const detail = (c.sans_regle || []).map((s) => `${s.fluide} : ${s.compteurs} relevé(s) ${s.pas}`).join(' · ');
     bannieres.push(banniere('attention',
-      [c.sans_effet ? `${c.sans_effet} règle(s) active(s) ne tournent sur aucun compteur : le relevé de vos `
-        + 'compteurs est trop grossier pour elles.' : null,
-      c.compteurs_sans_regle ? ` ${c.compteurs_sans_regle} compteur(s) n'ont aucune règle de dérive (${detail}) : `
-        + 'seule la qualité de leurs données est contrôlée.' : null],
+      [c.compteurs_sans_regle ? `${c.compteurs_sans_regle} compteur(s) sans règle de dérive` : null,
+        c.sans_effet ? `${c.sans_effet} règle(s) sans effet sur votre parc` : null].filter(Boolean).join(' · ') + '.',
       h('button', { type: 'button', onclick: () => { sessionStorage.setItem('vigie-regles-ancre', 'couverture'); ctx.aller('#/regles'); } },
-        'Voir la couverture des règles'),
+        'Voir le détail des compteurs'),
       h('button', { type: 'button', class: 'lien', title: 'Masquer ce bandeau tant que la couverture ne change pas',
         onclick: () => { couvertureVue(c, true); ctx.aller('#/'); } }, 'J\'ai compris')));
   }

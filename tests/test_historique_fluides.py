@@ -232,6 +232,21 @@ class TestCouvertureDesRegles(unittest.TestCase):
         self.assertEqual(c["sans_regle"], [{"fluide": "Mazout", "pas": "au mois", "compteurs": 7}])  # ni météo ni débit
         self.assertEqual((c["sans_effet"], c["compteurs_sans_regle"]), (3, 7))   # eau la nuit, électricité nuit et jour
 
+    def test_chaque_compteur_sans_regle_est_explique(self):
+        points = [("S01-MZ", "S01 · Mairie", "Citerne", "mazout", 43200), ("S01-EL", "S01 · Mairie", "", "electricite", 43200),
+                  ("S02-INJ", "S02 · École", "", "electricite_injection", 15)]
+        regles_ = self.regles("elec_historique")
+        compteurs = [("mazout", 43200, 1), ("electricite", 43200, 1), ("electricite_injection", 15, 1)]
+        c = regles.couverture(compteurs, regles_, {"mazout": "Mazout"}, points)
+        par_id = {p["id"]: p for p in c["compteurs_detail"]}
+        self.assertEqual(set(par_id), {"S01-MZ", "S01-EL", "S02-INJ"})
+        self.assertEqual((par_id["S01-MZ"]["fluide"], par_id["S01-MZ"]["pas"]), ("Mazout", "au mois"))
+        self.assertIn("Aucune règle de dérive n'existe pour ce fluide", par_id["S01-MZ"]["explication"])
+        self.assertIn("est désactivée", par_id["S01-EL"]["explication"])          # elec_historique coupée
+        self.assertIn("exige un relevé à l'heure ou plus fin", par_id["S01-EL"]["explication"])
+        self.assertIn("production solaire", par_id["S02-INJ"]["explication"])
+        self.assertTrue(all("qualité de ses données" in p["explication"] for p in par_id.values()))
+
     def test_regle_desactivee_ses_compteurs_ne_sont_plus_couverts(self):
         c = regles.couverture([("electricite", 43200, 48)], self.regles("elec_historique"), {})
         self.assertEqual([a["regle"] for a in c["alertes"]], ["elec_nuit", "elec_jour"])  # heure et jour : trop fins

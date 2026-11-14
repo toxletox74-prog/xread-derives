@@ -452,7 +452,9 @@ def liste_regles(cx, ref_defauts):
                "metier": moteur.METIER_DONNEES}
     return {"regles": out, "qualite": qualite, "profils": moteur.PROFILS, "gravites": moteur.GRAVITES,
             "metiers": moteur.METIERS,
-            "couverture": regles.couverture(compteurs, out, {k: v[0] for k, v in db.FLUIDES.items()}),
+            "couverture": regles.couverture(compteurs, out, {k: v[0] for k, v in db.FLUIDES.items()}, cx.execute(
+                "SELECT p.id, i.id || ' · ' || i.nom, p.libelle, p.fluide, p.pas_min FROM point_mesure p LEFT JOIN immeuble i "
+                "ON i.id = p.immeuble_id WHERE p.etat = 'actif'").fetchall()),
             "matrice": regles.matrice([r["id"] for r in out if r["active"]], compteurs)}
 
 

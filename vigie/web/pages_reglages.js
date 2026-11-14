@@ -156,7 +156,19 @@ function couverture(c) {
       c.alertes.length ? h('ul', { class: 'liste-regles' }, c.alertes.map(ligne)) : null,
       c.sans_regle.length ? h('p', {}, h('span', { class: 'gras' }, 'Compteurs sans aucune règle de dérive : '),
         c.sans_regle.map((s) => `${s.fluide} (${s.compteurs} ${s.pas})`).join(' · '),
-        '. Seule la qualité de leurs données est contrôlée.') : null));
+        '. Seule la qualité de leurs données est contrôlée.') : null,
+      compteursSansRegle(c.compteurs_detail)));
+}
+
+// Chaque compteur qu'aucune règle ne surveille, avec la raison (relevé trop grossier, règle désactivée, fluide sans règle)
+function compteursSansRegle(liste) {
+  if (!liste || !liste.length) return null;
+  return h('div', { class: 'defile' }, h('table', {},
+    h('thead', {}, h('tr', {}, ['Compteur', 'Immeuble', 'Fluide', 'Relevé', 'Pourquoi aucune règle'].map((t) => h('th', { scope: 'col' }, t)))),
+    h('tbody', {}, liste.map((p) => h('tr', {},
+      h('td', {}, h('span', { class: 'gras' }, p.id), p.libelle ? h('div', { class: 'doux petit' }, p.libelle) : null),
+      h('td', {}, p.immeuble || '—'), h('td', {}, p.fluide), h('td', {}, p.pas),
+      h('td', { class: 'petit' }, p.explication))))));
 }
 
 function matrice(r) {
