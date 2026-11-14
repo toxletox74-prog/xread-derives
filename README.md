@@ -353,35 +353,6 @@ température fictive à cycle annuel, hors ligne). Les compteurs suivent le nomb
   hors ligne) : modules inclinés, pertes de température, décote de 0,5 %/an depuis la mise en service, onduleur
   limité à 90 % de la puissance crête.
 
-Le comptage de la chaleur PAC varie d'un immeuble à l'autre : chaleur totale, chauffage seul, eau chaude seule, ou
-électricité seule.
-
-Installations solaires : immeubles T8 et A (immeubles d'origine, 30 kWc et 45 kWc) ;
-G03, G06, G10, G14 et G17 dans les immeubles ajoutés.
-
-**Dérive solaire injectée dans les immeubles d'origine** : T8 perd une chaîne de modules sur quatre (−25 % depuis
-14 jours, panne). A est sain.
-
-**Dérives injectées dans les immeubles ajoutés** (en fin de période), en plus des 7 d'origine :
-- G02 : rendement PAC en baisse, avec la chaleur de chauffage seule comptée ;
-- G05 : fuite d'eau de nuit ;
-- G08 : électricité de nuit +30 % ;
-- G18 (CAD) : chaleur livrée +18 % à météo égale depuis 12 jours ;
-- G20 (gaz) : gaz +18 % à météo égale depuis 12 jours ;
-- G06 (solaire 80 kWc) : une chaîne de modules hors service, −25 % depuis 14 jours (panne) ;
-- G03 (solaire 60 kWc) : encrassement progressif jusqu'à −22 % sur 35 jours (dégradation) ;
-- G14 (solaire 40 kWc) : onduleur à l'arrêt depuis 6 jours.
-
-G17 (CAD) et G19 (gaz) sont sains, comme les installations solaires de G17 et de G10 (en travaux : règles d'énergie
-suspendues). G12 a un compteur d'eau chaude « à connecter ». Les 15 autres immeubles ajoutés, dont 2 partiellement
-occupés et 1 en travaux, ne doivent déclencher **aucune alerte**.
-
-Dans l'exemple, chaque fluide a un partenaire fictif par secteur (rive droite, rive gauche, communes) : un
-électricien, un frigoriste pour la PAC, une entreprise sanitaire pour l'eau, un chauffagiste et un installateur
-solaire (sociétés fictives), plus un autre installateur solaire fictif.
-Chaque immeuble a aussi un gestionnaire, un concierge et des données techniques fictifs. Deux adresses sont fictives :
-elles sont placées au centre de leur commune et indiquées « position approximative ».
-
 ## Bons de travaux
 
 1. Chaque règle désigne un **métier** (Sanitaire pour une fuite, Chauffagiste pour le chauffage, Frigoriste
