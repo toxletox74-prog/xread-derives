@@ -114,6 +114,33 @@ class TestEspaces(unittest.TestCase):
         registre.close()
         self.assertNotIn(cle, stocke)
 
+    def test_cle_mcp_de_la_base_principale(self):
+        x = {"X-Vigie": "1"}
+        self.assertIsNone(self.req("GET", "/api/mcp")[1]["cle_creee"])
+        statut, r = self.req("POST", "/api/mcp/cle", entetes=x)
+        self.assertEqual((statut, r["chemin"]), (200, "/mcp"))
+        cle = r["cle"]
+        self.assertIsNotNone(self.req("GET", "/api/mcp")[1]["cle_creee"])
+        # la clé ouvre /mcp sur la base principale (mêmes alertes que l'API), et rien d'autre
+        _, appel = self.mcp({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                             "params": {"name": "lister_alertes", "arguments": {"statut": "toutes"}}}, cle=cle)
+        ids = [a["id"] for a in json.loads(appel["result"]["content"][0]["text"])["alertes"]]
+        self.assertEqual(ids, [a["id"] for a in self.req("GET", "/api/alertes?statut=toutes")[1]["alertes"]])
+        self.assertEqual(self.req("GET", "/api/etat", cle=cle)[0], 403)
+        self.assertEqual(self.req("POST", "/api/analyser", cle=cle)[0], 403)
+        # une nouvelle clé remplace l'ancienne ; la révocation coupe tout
+        nouvelle = self.req("POST", "/api/mcp/cle", entetes=x)[1]["cle"]
+        ping = {"jsonrpc": "2.0", "id": 2, "method": "ping"}
+        self.assertEqual(self.mcp(ping, cle=cle)[0], 401)
+        self.assertEqual(self.mcp(ping, cle=nouvelle)[0], 200)
+        self.assertEqual(self.req("DELETE", "/api/mcp/cle", entetes=x)[1]["revoquees"], 1)
+        self.assertEqual(self.mcp(ping, cle=nouvelle)[0], 401)
+        # réservé : sans session derrière un serveur frontal, et jamais pour la clé d'un espace
+        self.assertEqual(self.req("GET", "/api/mcp", entetes={"X-Forwarded-For": "203.0.113.9"})[0], 401)
+        self.assertEqual(self.req("POST", "/api/mcp/cle", cle=self.cle_b)[0], 403)
+        with self.assertRaises(espaces.ErreurEspace):
+            espaces.Espaces(self.dossier).creer(espaces.PRINCIPAL)
+
     def test_routes_reservees_a_l_interface(self):
         for methode, chemin in (("GET", "/api/reglages"), ("PUT", "/api/reglages"), ("POST", "/api/connecteur/tester"),
                                 ("GET", "/api/connecteur"), ("POST", "/api/bons/1/envoyer"), ("POST", "/api/session"),

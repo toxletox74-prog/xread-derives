@@ -11,6 +11,9 @@ le service y importe ses relevés, lance l'analyse et lit ses dérives, par l'AP
 La clé n'est affichée qu'une fois ; le registre (espaces/registre.db) n'en garde que l'empreinte SHA-256.
 Routes interdites aux espaces : celles qui font sortir quelque chose du serveur (courriels, connecteur fournisseur)
 ou qui ne concernent que l'interface de gestion (session, base d'exemple).
+
+Clé MCP de la base principale : générée depuis l'interface par une personne connectée (bouton « Claude (MCP) »),
+elle n'ouvre que /mcp (outils en lecture seule) sur la base principale, jamais l'API. Une seule active à la fois.
 """
 import hashlib
 import os
@@ -21,8 +24,10 @@ import threading
 from datetime import datetime, timezone
 
 PREFIXE = "vgk_"
+PRINCIPAL = "_principal"  # espace réservé (hors ID_RE : impossible à créer en ligne de commande) = base principale
 ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,39}")
-INTERDITES = re.compile(r"/api/(session|reglages|exemple|connecteur(/.*)?|bons/\d+/envoyer)|/demo-fournisseur/.*")
+INTERDITES = re.compile(r"/api/(session|reglages|exemple|mcp(/cle)?|connecteur(/.*)?|bons/\d+/envoyer)"
+                        r"|/demo-fournisseur/.*")
 MESSAGE_CLE = "Clé API absente, invalide ou révoquée."
 MESSAGE_INTERDITE = "Route réservée à l'interface de gestion : indisponible avec une clé API."
 SCHEMA = """CREATE TABLE IF NOT EXISTS cle (
@@ -75,15 +80,35 @@ class Espaces:
         from . import db
         os.makedirs(os.path.dirname(self.base(espace)), exist_ok=True)
         db.connecter(self.base(espace)).close()  # base vide au schéma courant
+        return self._nouvelle_cle(espace, nom)
+
+    def _nouvelle_cle(self, espace, nom, remplacer=False):
         cle = PREFIXE + secrets.token_urlsafe(32)
         cx = self._registre()
         try:
+            if remplacer:
+                cx.execute("UPDATE cle SET revoquee = ? WHERE espace = ? AND revoquee IS NULL", (_maintenant(), espace))
             cx.execute("INSERT INTO cle (empreinte, espace, nom, creee) VALUES (?, ?, ?, ?)",
                        (_empreinte(cle), espace, nom, _maintenant()))
             cx.commit()
         finally:
             cx.close()
         return cle
+
+    def cle_principale(self):
+        """Nouvelle clé MCP de la base principale ; la précédente cesse aussitôt de fonctionner."""
+        return self._nouvelle_cle(PRINCIPAL, "Claude (MCP), base principale", remplacer=True)
+
+    def etat_principal(self):
+        """Date de création de la clé MCP active de la base principale, ou None."""
+        if not os.path.exists(os.path.join(self.dossier, "registre.db")):
+            return None
+        cx = self._registre()
+        try:
+            ligne = cx.execute("SELECT max(creee) FROM cle WHERE espace = ? AND revoquee IS NULL", (PRINCIPAL,)).fetchone()
+        finally:
+            cx.close()
+        return ligne[0]
 
     def lister(self):
         cx = self._registre()

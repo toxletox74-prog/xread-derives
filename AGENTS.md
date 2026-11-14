@@ -16,7 +16,7 @@ chaque fichier et les règles à respecter. La documentation fonctionnelle compl
 
 ```bash
 pip install -r requirements.txt
-python -m unittest discover -s tests        # 287 tests, ~120 s, doivent rester verts (2 ignorés hors DPAPI Windows)
+python -m unittest discover -s tests        # 288 tests, ~120 s, doivent rester verts (2 ignorés hors DPAPI Windows)
 python -m vigie interface                   # interface sur vigie.db → http://127.0.0.1:8765
 python -m vigie interface --demo            # interface sur la base d'exemple vigie_demo.db
 python -m vigie analyser                    # détection sur vigie.db, écrit sorties/
@@ -89,6 +89,7 @@ xread-derives/
 │       ├── fiche.js           fiche technique d'un immeuble
 │       ├── carte.js           carte du parc (swisstopo + Leaflet)
 │       ├── connecteur.js      réglages du connecteur API
+│       ├── claude.js          bouton « Claude (MCP) » : clé MCP de la base principale, commandes de branchement
 │       ├── rejeu.js           écran du rejeu
 │       ├── icones.js          pictogrammes SVG construits dans le DOM
 │       ├── app.css            styles, jetons de couleur clair/sombre

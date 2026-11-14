@@ -3,6 +3,7 @@ import { api, h, vider, toast, tenter, dialogue, saisie, champ } from './outils.
 import { icone, etatVide } from './icones.js';
 import { pageTableau, pageAlertes, pageBons } from './pages_suivi.js';
 import { pageRejeu } from './rejeu.js';
+import { dialogueClaude } from './claude.js';
 import { pageParc, pageImports } from './pages_parc.js';
 import { pageImmeuble } from './fiche.js';
 import { pagePrestataires, pageRegles, pageReglages } from './pages_reglages.js';
@@ -66,10 +67,12 @@ async function rafraichirEtat() {
 function boutonAcces(acces) {
   if (!acces) return null;
   const lien = (texte, action) => h('button', { type: 'button', class: 'lien', style: 'color:inherit', onclick: action }, texte);
+  const claude = lien('Claude (MCP)', dialogueClaude); // brancher Claude sur ce parc : réservé à qui peut modifier
   if (acces.session) {
-    return lien('Se déconnecter', async () => { await tenter(() => api('DELETE', '/api/session')); await ctx.recharger(); });
+    return [' · ', claude, ' · ',
+      lien('Se déconnecter', async () => { await tenter(() => api('DELETE', '/api/session')); await ctx.recharger(); })];
   }
-  if (acces.ecriture) return null;
+  if (acces.ecriture) return [' · ', claude];
   if (!acces.connexion) return ' · Lecture seule';
   return [' · Lecture seule', lien('Se connecter', () => {
     const mdp = saisie('mot_de_passe', '', { type: 'password', autocomplete: 'current-password', autofocus: true,

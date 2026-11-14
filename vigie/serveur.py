@@ -52,8 +52,9 @@ class Reponse:
 class Application:
     """État partagé du serveur : une connexion SQLite protégée par un verrou."""
 
-    def __init__(self, chemin_base, sortie=None):
+    def __init__(self, chemin_base, sortie=None, tiers=None):
         self.chemin = chemin_base
+        self.tiers = tiers  # espaces.Espaces : clés API (ici, la clé MCP de la base principale)
         self.sortie = sortie  # None : sorties/ du projet ; dossier propre pour un espace de service tiers
         self.cx = db.connecter(chemin_base)
         self.verrou = threading.Lock()
@@ -119,6 +120,9 @@ class Application:
             ("GET", r"/api/import/patrimoine", self.lire_patrimoine),
             ("POST", r"/api/import/courbes", self.import_courbes),
             ("GET", r"/api/rejeu", self.lire_rejeu),
+            ("GET", r"/api/mcp", self.lire_mcp),
+            ("POST", r"/api/mcp/cle", self.cle_mcp),
+            ("DELETE", r"/api/mcp/cle", self.revoquer_mcp),
             ("GET", r"/api/connecteur", self.lire_connecteur),
             ("PUT", r"/api/connecteur", self.ecrire_connecteur),
             ("DELETE", r"/api/connecteur/cle", self.effacer_cle_connecteur),
@@ -451,6 +455,22 @@ class Application:
     def _sortie(self):
         return self.sortie or service.SORTIE
 
+    # ------------------------------------------------------------ Claude (MCP) sur la base principale
+
+    def _registre_tiers(self):
+        if self.tiers is None:
+            raise parc.ErreurSaisie("Clés API indisponibles sur ce serveur.")
+        return self.tiers
+
+    def lire_mcp(self, req):
+        return {"chemin": "/mcp", "cle_creee": self._registre_tiers().etat_principal()}
+
+    def cle_mcp(self, req):
+        return {"chemin": "/mcp", "cle": self._registre_tiers().cle_principale()}
+
+    def revoquer_mcp(self, req):
+        return {"revoquees": self._registre_tiers().revoquer(espaces.PRINCIPAL)}
+
     @staticmethod
     def _rapport_import(r):
         r["anomalies_total"] = len(r["anomalies"])
@@ -661,7 +681,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
         espace = self.espaces.espace_de(cle)
         if espace is None:
             return self._json(401, {"erreur": espaces.MESSAGE_CLE}, {"WWW-Authenticate": "Bearer"})
-        app = self.espaces.application(espace)
+        if espace == espaces.PRINCIPAL and chemin != "/mcp":  # clé MCP de la base principale : /mcp seulement
+            return self._json(403, {"erreur": "Cette clé n'ouvre que le serveur MCP (/mcp)."})
+        app = self.app if espace == espaces.PRINCIPAL else self.espaces.application(espace)
         if chemin == "/mcp":
             from . import mcp  # import tardif : mcp importe ce module
             if methode != "POST":
@@ -782,8 +804,8 @@ class ServeurVigie(ThreadingHTTPServer):
 
 
 def creer_serveur(chemin_base, port=8765, dossier_espaces=None):
-    app = Application(chemin_base)
     tiers = espaces.Espaces(dossier_espaces or os.path.join(service.RACINE, "espaces"))
+    app = Application(chemin_base, tiers=tiers)
     gestionnaire = type("GestionnaireVigie", (Gestionnaire,), {"app": app, "espaces": tiers})
     return ServeurVigie(("127.0.0.1", port), gestionnaire), app
 

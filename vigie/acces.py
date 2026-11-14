@@ -21,8 +21,9 @@ DELAI_ECHEC_S = 1.0  # ralentit les essais de mots de passe
 MESSAGE = "Lecture seule : connectez-vous pour modifier."
 EN_TETES_FRONTAL = ("X-Forwarded-For", "X-Real-IP", "X-Forwarded-Proto", "X-Forwarded-Host", "Forwarded")
 SESSION = "/api/session"
-# Lectures réservées : réglages de messagerie (serveur, utilisateur SMTP) et connecteur API (adresse du fournisseur)
-LECTURES_RESERVEES = re.compile(r"/api/(reglages|connecteur)")
+# Lectures réservées : réglages de messagerie (serveur, utilisateur SMTP), connecteur API (adresse du fournisseur),
+# clé MCP de la base principale (date de création)
+LECTURES_RESERVEES = re.compile(r"/api/(reglages|connecteur|mcp)")
 
 
 def reserve(methode, chemin):

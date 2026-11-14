@@ -283,10 +283,22 @@ Parcours type : parc (`/api/import/parc` ou `/api/import/patrimoine`), relevés 
 `/api/import/courbes`), météo (`POST /api/meteo/maj` : la mise à jour automatique toutes les 3 h et l'analyse
 planifiée ne tournent que pour la base principale), analyse (`POST /api/analyser`), puis alertes et bons.
 
-**Routes interdites aux espaces** (`403`) : `/api/session`, `/api/reglages` (messagerie), `/api/connecteur…`
+**Routes interdites aux espaces** (`403`) : `/api/session`, `/api/reglages` (messagerie), `/api/mcp…`, `/api/connecteur…`
 (fournisseur de télérelève), `/api/exemple`, `POST /api/bons/{id}/envoyer` et `/demo-fournisseur/…`. Rien ne sort
 du serveur au nom d'un espace : ni courriel, ni appel à un fournisseur. Les bons se préparent et se lisent
 (`GET /api/bons/{id}/eml`), le service les transmet lui-même.
+
+### Claude (MCP) sur la base principale
+
+Une personne connectée à l'interface (bouton « Claude (MCP) » du bandeau) génère une clé qui ouvre `/mcp` sur la
+**base principale**, et rien d'autre (toute route de l'API : `403`). Une seule clé active : en générer une nouvelle
+révoque la précédente. Routes réservées (session, ou poste local) :
+
+| Route | Rôle |
+|---|---|
+| `GET /api/mcp` | `{chemin: "/mcp", cle_creee}` : date de création de la clé active, ou `null` |
+| `POST /api/mcp/cle` | Nouvelle clé (`{chemin, cle}`), affichée une seule fois ; l'ancienne cesse de fonctionner |
+| `DELETE /api/mcp/cle` | Révoque la clé (`{revoquees}`) |
 
 ### MCP sur HTTP
 
