@@ -285,7 +285,7 @@ plusieurs mois de suite, est une dérive. C'est la seule règle des compteurs re
   - `solaire_degradation` (Modérée, 7 jours ensoleillés, −10 %) : baisse progressive au-delà de la décote
     (encrassement, vieillissement anormal, ombrage).
 - **Chiffrage** : production perdue = Σ (attendu − mesuré) depuis le début, sur les heures mesurées ; valeur du kWh
-  solaire perdu 0,1185 CHF (rétribution SIG 2026 de l'injection, indicative : un minimum, la part autoconsommée
+  solaire perdu 0,1185 CHF (rétribution publique 2026 de l'injection, indicative : un minimum, la part autoconsommée
   vaut le tarif de l'électricité) ; CO₂ = électricité du réseau
   achetée à la place (EXEMPLE). Projection 12 mois = perte relative × production prévue décotée (hypothèse).
 
@@ -356,32 +356,31 @@ température fictive à cycle annuel, hors ligne). Les compteurs suivent le nomb
 Le comptage de la chaleur PAC varie d'un immeuble à l'autre : chaleur totale, chauffage seul, eau chaude seule, ou
 électricité seule.
 
-Installations solaires : T8 Les Tilleuls (30 kWc, 2019) et Ormeaux A (45 kWc, 2016) dans les immeubles d'origine ;
+Installations solaires : immeubles T8 et A (immeubles d'origine, 30 kWc et 45 kWc) ;
 G03, G06, G10, G14 et G17 dans les immeubles ajoutés.
 
 **Dérive solaire injectée dans les immeubles d'origine** : T8 perd une chaîne de modules sur quatre (−25 % depuis
-14 jours, panne). Ormeaux A est sain.
+14 jours, panne). A est sain.
 
 **Dérives injectées dans les immeubles ajoutés** (en fin de période), en plus des 7 d'origine :
-- G02 Carl-Vogt 65 : rendement PAC en baisse, avec la chaleur de chauffage seule comptée ;
-- G05 Wendt 30 : fuite d'eau de nuit ;
-- G08 France 20 : électricité de nuit +30 % ;
-- G18 Vaudagne 13 (Meyrin, CAD) : chaleur livrée +18 % à météo égale depuis 12 jours ;
-- G20 Servette 40 (gaz) : gaz +18 % à météo égale depuis 12 jours ;
-- G06 Petit-Lancy 30 (solaire 80 kWc) : une chaîne de modules hors service, −25 % depuis 14 jours (panne) ;
-- G03 Lyon 87 (solaire 60 kWc) : encrassement progressif jusqu'à −22 % sur 35 jours (dégradation) ;
-- G14 Bel-Air 50 (solaire 40 kWc) : onduleur à l'arrêt depuis 6 jours.
+- G02 : rendement PAC en baisse, avec la chaleur de chauffage seule comptée ;
+- G05 : fuite d'eau de nuit ;
+- G08 : électricité de nuit +30 % ;
+- G18 (CAD) : chaleur livrée +18 % à météo égale depuis 12 jours ;
+- G20 (gaz) : gaz +18 % à météo égale depuis 12 jours ;
+- G06 (solaire 80 kWc) : une chaîne de modules hors service, −25 % depuis 14 jours (panne) ;
+- G03 (solaire 60 kWc) : encrassement progressif jusqu'à −22 % sur 35 jours (dégradation) ;
+- G14 (solaire 40 kWc) : onduleur à l'arrêt depuis 6 jours.
 
-G17 Lignon 40 (CAD) et G19 Vollandes 23 (gaz) sont sains, comme les installations solaires de G17 et de G10 (en
-travaux : règles d'énergie suspendues). G12 La Montagne 50 a un compteur d'eau chaude « à connecter ». Les 15 autres
-immeubles ajoutés, dont 2 partiellement occupés et 1 en travaux, ne doivent déclencher **aucune alerte**.
+G17 (CAD) et G19 (gaz) sont sains, comme les installations solaires de G17 et de G10 (en travaux : règles d'énergie
+suspendues). G12 a un compteur d'eau chaude « à connecter ». Les 15 autres immeubles ajoutés, dont 2 partiellement
+occupés et 1 en travaux, ne doivent déclencher **aucune alerte**.
 
 Dans l'exemple, chaque fluide a un partenaire fictif par secteur (rive droite, rive gauche, communes) : un
 électricien, un frigoriste pour la PAC, une entreprise sanitaire pour l'eau, un chauffagiste et un installateur
-solaire (Soleil Rive Droite Sàrl, Photovolta Rive Gauche SA, Solaire Communes Sàrl), plus Solaire Exemple SA.
-Chaque immeuble a aussi un gestionnaire, un concierge et des données techniques fictifs. Deux adresses sont fictives
-(Chemin des Tilleuls 8 à Onex, Avenue des Ormeaux 15 au Grand-Lancy) : elles sont placées au centre de leur commune
-et indiquées « position approximative ».
+solaire (sociétés fictives), plus un autre installateur solaire fictif.
+Chaque immeuble a aussi un gestionnaire, un concierge et des données techniques fictifs. Deux adresses sont fictives :
+elles sont placées au centre de leur commune et indiquées « position approximative ».
 
 ## Bons de travaux
 
@@ -536,7 +535,7 @@ le mesure pas ne donne que la température.
 ### Données, tarifs et connexions
 
 - **Tarifs et facteurs CO₂ = valeurs d'exemple** tant qu'ils ne sont pas saisis comme « tarif de mon contrat ».
-  Les tarifs par défaut reprennent les tarifs publics SIG 2026, indicatifs, hors abonnements et coûts fixes
+  Les tarifs par défaut reprennent les tarifs publics 2026, indicatifs, hors abonnements et coûts fixes
   (électricité 0,2707, gaz 0,0868, solaire 0,1185 CHF/kWh, eau 5,10 CHF/m³ ; chaleur et CAD 0,1105 CHF/kWh,
   milieu de la fourchette 0,086 à 0,135) : ils ne remplacent pas ceux de vos contrats.
 - Solaire compté à 0,1185 CHF/kWh : une petite coupure d'onduleur passe sous l'enjeu minimal (8,22 CHF/mois) et
