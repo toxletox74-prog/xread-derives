@@ -3,6 +3,8 @@
 
 export async function api(methode, chemin, corps, options = {}) {
   const init = { method: methode, headers: { 'X-Vigie': '1' } };
+  const consulte = espaceConsulte();
+  if (consulte && !options.principale) init.headers['X-Vigie-Espace'] = consulte;
   if (corps instanceof Blob || corps instanceof ArrayBuffer) {
     init.body = corps;
     init.headers['Content-Type'] = 'application/octet-stream';
@@ -23,6 +25,16 @@ export async function api(methode, chemin, corps, options = {}) {
   const donnees = await rep.json().catch(() => ({}));
   if (!rep.ok) throw new Error(donnees.erreur || 'Erreur ' + rep.status);
   return donnees;
+}
+
+// Espace consulté en lecture seule (jeu de test choisi dans le bandeau), mémorisé pour l'onglet ; vide = base principale
+export function espaceConsulte(id) {
+  try {
+    if (id !== undefined) {
+      if (id) sessionStorage.setItem('vigie-espace', id); else sessionStorage.removeItem('vigie-espace');
+    }
+    return sessionStorage.getItem('vigie-espace') || '';
+  } catch { return ''; }
 }
 
 // Balises créées dans l'espace de noms SVG (graphiques et pictogrammes de icones.js)

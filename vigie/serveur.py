@@ -120,6 +120,7 @@ class Application:
             ("GET", r"/api/import/patrimoine", self.lire_patrimoine),
             ("POST", r"/api/import/courbes", self.import_courbes),
             ("GET", r"/api/rejeu", self.lire_rejeu),
+            ("GET", r"/api/espaces", self.lire_espaces),
             ("GET", r"/api/mcp", self.lire_mcp),
             ("POST", r"/api/mcp/cle", self.cle_mcp),
             ("DELETE", r"/api/mcp/cle", self.revoquer_mcp),
@@ -462,6 +463,10 @@ class Application:
             raise parc.ErreurSaisie("Clés API indisponibles sur ce serveur.")
         return self.tiers
 
+    def lire_espaces(self, req):
+        """Espaces consultables en lecture seule depuis l'interface (VIGIE_ESPACES_CONSULTABLES)."""
+        return {"espaces": self.tiers.consultables() if self.tiers else []}
+
     def lire_mcp(self, req):
         return {"chemin": "/mcp", "cle_creee": self._registre_tiers().etat_principal()}
 
@@ -670,6 +675,13 @@ class Gestionnaire(BaseHTTPRequestHandler):
             nom = "index.html" if chemin == "/" else FICHIER_WEB_RE.match(chemin).group(1)
             if os.path.isfile(os.path.join(WEB, nom)):
                 return self._statique(nom)
+        consulte = self.headers.get(espaces.ENTETE_CONSULTATION)
+        if consulte:  # interface : espace nommé dans VIGIE_ESPACES_CONSULTABLES, en lecture seule
+            if consulte not in espaces.consultables() or not os.path.exists(self.espaces.base(consulte)):
+                return self._json(404, {"erreur": "Espace introuvable."})
+            if methode != "GET" or espaces.interdite(chemin) or acces.reserve(methode, chemin):
+                return self._json(403, {"erreur": espaces.MESSAGE_LECTURE})
+            return self._executer(self.espaces.application(consulte), methode, chemin)
         if methode != "GET" and self.headers.get("X-Vigie") != "1":
             return self._json(403, {"erreur": "Requête refusée."})
         if acces.reserve(methode, chemin) and not self.app.acces.autorise(self.headers):

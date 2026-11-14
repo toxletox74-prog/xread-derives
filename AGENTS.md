@@ -163,7 +163,8 @@ Les numéros sont ceux cités dans les commentaires du code.
 6. **Règle 9 : aucune donnée de consommation ne quitte le serveur.** Seuls accès sortants autorisés : MétéoSuisse,
    géocodeur fédéral, tuiles swisstopo, fournisseur API configuré (identifiants et période seulement). Exception : un
    service tiers relit, avec sa clé API, les données qu'il a lui-même envoyées dans son espace (`espaces.py`) ; une clé
-   n'ouvre jamais la base principale, et rien ne sort au nom d'un espace (ni courriel, ni connecteur).
+   n'ouvre jamais la base principale, et rien ne sort au nom d'un espace (ni courriel, ni connecteur). Un espace nommé dans
+   `VIGIE_ESPACES_CONSULTABLES` (jeu de test de l'exploitant) s'affiche aussi dans l'interface, en lecture seule.
 7. **Pas de nouvelle dépendance** sans nécessité : bibliothèque standard + pandas/numpy (ex. `excel.py` lit le xlsx
    lui-même). Pas de framework ni d'étape de build côté web.
 8. **Sécurité du serveur à préserver** : contrôle de l'en-tête `Host` (127.0.0.1/localhost), en-tête `X-Vigie` exigé
@@ -179,7 +180,7 @@ Les numéros sont ceux cités dans les commentaires du code.
 - Code dans `/var/www/xread-derive` (clone GitHub), venv `.venv`, service systemd `xread-derive` (utilisateur
   `xread`, port 127.0.0.1:8765), vhost nginx dédié qui réécrit `Host: 127.0.0.1` vers l'app.
 - Secrets éventuels dans `/etc/xread-derive.env` (`VIGIE_MOT_DE_PASSE` : mot de passe des écritures, sans lui l'interface publiée reste en lecture seule ;
-  `VIGIE_SMTP_MOT_DE_PASSE`, `VIGIE_API_CLE`).
+  `VIGIE_SMTP_MOT_DE_PASSE`, `VIGIE_API_CLE`, `VIGIE_ESPACES_CONSULTABLES`).
 - Redéployer : `git push` puis `./deploy.sh` (pull, dépendances, redémarrage, test de santé). La base `vigie.db`
   du serveur n'est jamais écrasée.
 - Le VPS héberge d'autres services (technistargets, etc.) : ne jamais modifier leurs vhosts, conteneurs ou services.

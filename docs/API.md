@@ -288,6 +288,19 @@ planifiée ne tournent que pour la base principale), analyse (`POST /api/analyse
 du serveur au nom d'un espace : ni courriel, ni appel à un fournisseur. Les bons se préparent et se lisent
 (`GET /api/bons/{id}/eml`), le service les transmet lui-même.
 
+### Espaces consultables depuis l'interface
+
+Un espace que l'exploitant **nomme** dans la variable d'environnement `VIGIE_ESPACES_CONSULTABLES` (`id1,id2`, par
+exemple un jeu de test) s'affiche dans l'interface sans clé, en **lecture seule** : un sélecteur du bandeau bascule
+entre la base principale et ces espaces. Aucun espace n'est consultable par défaut.
+
+| Route | Rôle |
+|---|---|
+| `GET /api/espaces` | `{espaces: [{id, nom}]}` : espaces consultables qui existent (vide sans la variable) |
+
+Une requête qui porte l'en-tête `X-Vigie-Espace: <id>` lit la base de cet espace : `GET` uniquement, hors routes
+interdites aux espaces et lectures réservées (`403`) ; espace non nommé ou inexistant : `404`.
+
 ### Claude (MCP) sur la base principale
 
 Une personne connectée à l'interface (bouton « Claude (MCP) » du bandeau) génère une clé qui ouvre `/mcp` sur la
@@ -311,4 +324,5 @@ curl -H "Authorization: Bearer $CLE" -H "Content-Type: application/json"      -d
 ```
 
 **Règle 9.** Les données d'un espace sont celles que le service a lui-même envoyées ; elles ne sont rendues qu'à qui
-présente sa clé. La base principale n'est jamais exposée par une clé.
+présente sa clé, sauf si l'exploitant l'a lui-même nommé dans `VIGIE_ESPACES_CONSULTABLES` (lecture seule). La
+base principale n'est jamais exposée par une clé.

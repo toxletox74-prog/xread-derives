@@ -1,5 +1,5 @@
 // Vigie — navigation entre les écrans et état général (bandeau, compteurs).
-import { api, h, vider, toast, tenter, dialogue, saisie, champ } from './outils.js';
+import { api, h, vider, toast, tenter, dialogue, saisie, champ, espaceConsulte } from './outils.js';
 import { icone, etatVide } from './icones.js';
 import { pageTableau, pageAlertes, pageBons } from './pages_suivi.js';
 import { pageRejeu } from './rejeu.js';
@@ -45,6 +45,8 @@ const ctx = {
 
 async function rafraichirEtat() {
   try {
+    if (ctx.espaces === undefined) ctx.espaces = (await api('GET', '/api/espaces', undefined, { principale: true })).espaces;
+    if (espaceConsulte() && !ctx.espaces.some((x) => x.id === espaceConsulte())) espaceConsulte('');
     ctx.etat = await api('GET', '/api/etat');
   } catch (e) {
     toast(e.message, true);
@@ -59,8 +61,19 @@ async function rafraichirEtat() {
     return h('a', { href, class: actif ? 'actif' : null, 'aria-current': actif ? 'page' : null }, icone(ico), lib,
       n ? h('span', { class: 'pastille-nav', title: badge === 'alertes' ? 'alertes critiques' : 'bons à valider' }, n) : null);
   }));
-  vider(document.getElementById('base-info'),
-    e.base === 'vigie_demo.db' ? 'Base d\'exemple (données fictives)' : 'Données locales · ' + e.base, boutonAcces(e.acces));
+  const consulte = ctx.espaces.find((x) => x.id === espaceConsulte());
+  vider(document.getElementById('base-info'), choixBase(),
+    consulte ? `Espace « ${consulte.nom} » · lecture seule`
+      : [e.base === 'vigie_demo.db' ? 'Base d\'exemple (données fictives)' : 'Données locales · ' + e.base, boutonAcces(e.acces)]);
+}
+
+// Bascule entre la base principale et les espaces ouverts à la consultation (jeux de test, serveur : espaces.py)
+function choixBase() {
+  if (!ctx.espaces.length) return null;
+  const choix = h('select', { 'aria-label': 'Base affichée', onchange: () => { espaceConsulte(choix.value); ctx.recharger(); } },
+    h('option', { value: '' }, 'Base principale'),
+    ctx.espaces.map((x) => h('option', { value: x.id, selected: x.id === espaceConsulte() }, x.nom)));
+  return [choix, ' '];
 }
 
 // Lecture seule sans identification (serveur : acces.py) : le bandeau le dit et propose la connexion

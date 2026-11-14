@@ -149,6 +149,30 @@ class TestEspaces(unittest.TestCase):
         # sans clé, l'interface garde ses protections : écriture sans X-Vigie refusée
         self.assertEqual(self.req("POST", "/api/analyser")[0], 403)
 
+    def test_espace_consultable_depuis_l_interface_en_lecture_seule(self):
+        voir = {espaces.ENTETE_CONSULTATION: "beta"}
+        # par défaut, aucun espace n'est consultable sans clé
+        self.assertEqual(self.req("GET", "/api/espaces")[1]["espaces"], [])
+        self.assertEqual(self.req("GET", "/api/etat", entetes=voir)[0], 404)
+        ancien = os.environ.get("VIGIE_ESPACES_CONSULTABLES")
+        os.environ["VIGIE_ESPACES_CONSULTABLES"] = "beta, inexistant"
+        try:
+            self.assertEqual(self.req("GET", "/api/espaces")[1]["espaces"], [{"id": "beta", "nom": "beta"}])
+            statut, etat = self.req("GET", "/api/etat", entetes=voir)
+            self.assertEqual(statut, 200)
+            self.assertTrue(etat["parc_vide"])                       # la base de beta, pas la base principale
+            self.assertFalse(self.req("GET", "/api/etat")[1]["parc_vide"])
+            for methode, chemin in (("POST", "/api/analyser"), ("PUT", "/api/reglages"), ("GET", "/api/reglages"),
+                                    ("GET", "/api/connecteur"), ("GET", "/api/mcp")):
+                self.assertEqual(self.req(methode, chemin, {}, entetes={**voir, "X-Vigie": "1"})[0], 403, chemin)
+            self.assertEqual(self.req("GET", "/api/etat", entetes={espaces.ENTETE_CONSULTATION: "alpha"})[0], 404)
+            self.assertEqual(self.req("GET", "/api/etat", entetes={espaces.ENTETE_CONSULTATION: "inexistant"})[0], 404)
+        finally:
+            if ancien is None:
+                os.environ.pop("VIGIE_ESPACES_CONSULTABLES")
+            else:
+                os.environ["VIGIE_ESPACES_CONSULTABLES"] = ancien
+
     def test_identifiant_d_espace_et_ligne_de_commande(self):
         with self.assertRaises(espaces.ErreurEspace):
             espaces.Espaces(self.dossier).creer("../evasion")

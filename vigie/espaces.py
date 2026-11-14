@@ -28,6 +28,8 @@ PRINCIPAL = "_principal"  # espace réservé (hors ID_RE : impossible à créer 
 ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,39}")
 INTERDITES = re.compile(r"/api/(session|reglages|exemple|mcp(/cle)?|connecteur(/.*)?|bons/\d+/envoyer)"
                         r"|/demo-fournisseur/.*")
+ENTETE_CONSULTATION = "X-Vigie-Espace"  # interface : espace consulté en lecture seule, sans clé
+MESSAGE_LECTURE = "Espace consulté en lecture seule depuis l'interface : modifications impossibles."
 MESSAGE_CLE = "Clé API absente, invalide ou révoquée."
 MESSAGE_INTERDITE = "Route réservée à l'interface de gestion : indisponible avec une clé API."
 SCHEMA = """CREATE TABLE IF NOT EXISTS cle (
@@ -48,6 +50,14 @@ def jeton(entetes):
 
 def interdite(chemin):
     return bool(INTERDITES.fullmatch(chemin))
+
+
+def consultables():
+    """Espaces que l'interface peut afficher en lecture seule, sans clé : ceux que l'exploitant nomme dans
+    VIGIE_ESPACES_CONSULTABLES (« id1,id2 »), par exemple un jeu de test. Aucun par défaut : l'espace d'un service
+    tiers reste réservé à sa clé (règle 9)."""
+    ids = (e.strip() for e in os.environ.get("VIGIE_ESPACES_CONSULTABLES", "").split(","))
+    return [e for e in ids if ID_RE.fullmatch(e)]
 
 
 def _empreinte(cle):
@@ -117,6 +127,13 @@ class Espaces:
         finally:
             cx.close()
         return [{"espace": e, "nom": n, "creee": c, "revoquee": r} for e, n, c, r in lignes]
+
+    def consultables(self):
+        """Espaces consultables qui existent, avec leur nom (celui de leur dernière clé)."""
+        noms = {}
+        if os.path.exists(os.path.join(self.dossier, "registre.db")):
+            noms = {c["espace"]: c["nom"] for c in self.lister()}  # trié par date de création : la dernière l'emporte
+        return [{"id": e, "nom": noms.get(e) or e} for e in consultables() if os.path.exists(self.base(e))]
 
     def revoquer(self, espace):
         """Révoque toutes les clés actives de l'espace ; rend leur nombre. La base de l'espace n'est pas touchée."""
