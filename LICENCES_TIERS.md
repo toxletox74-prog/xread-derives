@@ -61,5 +61,6 @@ pandas et numpy : licence BSD 3-Clause.
 
 ## Valeurs d'exemple
 
-Les tarifs, facteurs CO₂ et le pouvoir calorifique du gaz livrés dans `config/` sont des valeurs d'EXEMPLE, à
-remplacer par les contrats et le référentiel retenu. Les prestataires « Exemple SA » sont fictifs.
+Les tarifs livrés dans `config/` reprennent les tarifs publics SIG 2026, à titre indicatif ; les facteurs CO₂ et
+le pouvoir calorifique du gaz sont des valeurs d'EXEMPLE. Tous sont à remplacer par les contrats et le
+référentiel retenu. Les prestataires « Exemple SA » sont fictifs.

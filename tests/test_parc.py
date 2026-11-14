@@ -186,7 +186,8 @@ class TestReglesReglables(unittest.TestCase):
         # chauffage : CHF mesurés depuis le début de la dérive (plus d'annualisation) ; eau : CHF/an
         cle = lambda a: a["chf_mesure"] if a["chiffrage"] == "mesure" else a["chf_an"]  # noqa: E731
         avant = {a["id"]: cle(a) for a in analyser(cx)}
-        parc.enregistrer_couts(cx, {"tarifs": [{"vecteur": "chaleur", "chf_par_unite": 0.24, "statut": "CONTRAT"}]},
+        double = 2 * service.defauts()["tarifs"]["chaleur"]["chf_par_unite"]  # le double du tarif par défaut
+        parc.enregistrer_couts(cx, {"tarifs": [{"vecteur": "chaleur", "chf_par_unite": double, "statut": "CONTRAT"}]},
                                service.defauts())
         apres = {a["id"]: cle(a) for a in analyser(cx)}
         self.assertAlmostEqual(apres["R41-chaleur_vide"], 2 * avant["R41-chaleur_vide"], delta=2)

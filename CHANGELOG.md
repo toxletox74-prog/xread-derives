@@ -12,6 +12,12 @@ version précédente).
 
 ## Après la V0.3.0 (non publié)
 
+- **Tarifs par défaut** : tarifs publics SIG 2026, indicatifs, hors abonnements et coûts fixes (électricité
+  0,2707, gaz 0,0868, solaire perdu 0,1185 CHF/kWh, eau 5,10 CHF/m³ ; chaleur et CAD 0,1105 CHF/kWh, milieu de
+  la fourchette 0,086 à 0,135). Ils restent marqués « valeur d'exemple » tant que ceux des contrats ne sont pas
+  saisis ; une base où les coûts ont déjà été enregistrés garde les siens. Conséquence mesurée : sur le grand
+  exemple en météo réelle, la coupure d'onduleur du G17 (7 CHF/mois) passe sous l'enjeu minimal et n'est plus
+  levée (15 dérives sur 16) ; l'exemple standard et le grand exemple en météo fictive restent à 100 %.
 - **Lecture seule sans identification** : derrière un serveur frontal ou dès que `VIGIE_MOT_DE_PASSE` est défini,
   la consultation est libre et toute modification exige une session (`vigie/acces.py`).
 - **Analyse automatique** toutes les N heures et après un relevé API automatique ; avertissement quand le mot de

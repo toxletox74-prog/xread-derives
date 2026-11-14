@@ -285,7 +285,8 @@ plusieurs mois de suite, est une dérive. C'est la seule règle des compteurs re
   - `solaire_degradation` (Modérée, 7 jours ensoleillés, −10 %) : baisse progressive au-delà de la décote
     (encrassement, vieillissement anormal, ombrage).
 - **Chiffrage** : production perdue = Σ (attendu − mesuré) depuis le début, sur les heures mesurées ; valeur du kWh
-  solaire perdu 0,20 CHF (EXEMPLE, autoconsommation évitée et reprise du surplus) ; CO₂ = électricité du réseau
+  solaire perdu 0,1185 CHF (rétribution SIG 2026 de l'injection, indicative : un minimum, la part autoconsommée
+  vaut le tarif de l'électricité) ; CO₂ = électricité du réseau
   achetée à la place (EXEMPLE). Projection 12 mois = perte relative × production prévue décotée (hypothèse).
 
 ### Ce que chiffre une alerte
@@ -535,6 +536,12 @@ le mesure pas ne donne que la température.
 ### Données, tarifs et connexions
 
 - **Tarifs et facteurs CO₂ = valeurs d'exemple** tant qu'ils ne sont pas saisis comme « tarif de mon contrat ».
+  Les tarifs par défaut reprennent les tarifs publics SIG 2026, indicatifs, hors abonnements et coûts fixes
+  (électricité 0,2707, gaz 0,0868, solaire 0,1185 CHF/kWh, eau 5,10 CHF/m³ ; chaleur et CAD 0,1105 CHF/kWh,
+  milieu de la fourchette 0,086 à 0,135) : ils ne remplacent pas ceux de vos contrats.
+- Solaire compté à 0,1185 CHF/kWh : une petite coupure d'onduleur passe sous l'enjeu minimal (8,22 CHF/mois) et
+  n'est plus affichée. Sur le grand exemple en météo réelle, celle du G17 (58 kWh/mois, 7 CHF) est masquée :
+  `python -m vigie evaluer --grand --meteo-reelle` lève 15 dérives sur 16 (16 sur 16 à 0,20 CHF/kWh).
   Les tarifs sont communs à tout le parc : pas encore de tarif par immeuble ou par contrat.
 - CAD et gaz : PCS et tarifs d'exemple à remplacer par ceux des contrats. Le gaz en m³ est converti par un facteur
   unique (`gaz_pcs_kwh_par_m3`), pas par le facteur mensuel du distributeur ; un compteur de gaz en m³ sans PCS

@@ -95,7 +95,8 @@ class TestExemple(unittest.TestCase):
         self.assertIn("La baisse est apparue d'un coup", a["constat"])
         self.assertIn("chaîne (string)", a["constat"])
         self.assertIn("0,5 %/an", a["constat"])
-        self.assertAlmostEqual(a["chf_mois"], a["kwh_mois"] * 0.20, delta=1)  # tarif solaire d'EXEMPLE
+        tarif = service.defauts()["tarifs"]["solaire"]["chf_par_unite"]  # tarif solaire par défaut
+        self.assertAlmostEqual(a["chf_mois"], a["kwh_mois"] * tarif, delta=1)
         self.assertIn("production prévue", a["projection"])
         self.assertGreater(a["kwh_mesure"], 0)
         self.assertFalse(any(i.startswith("OA-solaire") for i in self.alertes))
