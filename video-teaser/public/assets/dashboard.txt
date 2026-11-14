@@ -1,0 +1,65 @@
+Tableau de bord du parc
+
+4 adresses · 5 immeubles · 20 compteurs suivis · données au 11.11.2026 07:00 · analyse du 14.11.2026 10:42
+
+Lancer l'analyse
+Alertes ouvertes
+7
+Critique 2
+Élevée 3
+Modérée 1
+Données 1
+dont 2 critique(s) · 1 problème(s) de données
+Rythme des dérives ouvertes
+≈ 3 843 CHF/mois
+dérives constatées ≈ 1 213 CHF · tarifs d'exemple, à remplacer
+Projection si rien n'est fait
+≈ 34 765 CHF sur 12 mois
+hypothèses : climat normal de Genève, dérive constante — information, pas un déclencheur
+À traiter, par priorité
+Classement : rythme mensuel en CHF × confiance × urgence (× 1,5 si risque de sinistre) · 1 alerte par cause et par immeuble
+Chaleur · 2
+Eau froide · 1
+Pompe à chaleur · 1
+Production solaire · 1
+Électricité · 1
+1
+Critique
+Chaleur
+depuis 9 jours
+Chauffage normal dans un immeuble déclaré vide
+Immeuble Rhône 41 · Rue du Rhône 41, 1204 Genève
+
+L'immeuble est déclaré vide mais la chaufferie produit 867 kWh/jour depuis 9 jours, au lieu de 200 kWh/jour au maximum en hors-gel.
+
+Consigne — Chauffagiste, sous 48 h : Repasser la chaufferie en mode hors-gel et vérifier pourquoi le mode a changé (intervention, coupure, régulateur).
+
+Votre avis :
+Pertinente
+Déjà connue
+Fausse alerte
+Dérive constatée : ≈ 760 CHF
+6 337 kWh depuis le 02.11.2026 (223 heures mesurées) · rythme ≈ 2 403 CHF/mois (sur 9 jours) · Projection si rien n'est fait : ≈ 19 790 CHF sur 12 mois (hypothèse : climat normal de Genève, MétéoSuisse GVE 2016-2025)
+Confiance 95 %
+Imputation : Propriétaire (immeuble vide)
+Créer le bon de travaux
+2
+Élevée
+Chaleur
+depuis 11 jours
+Chauffage trop fort pour la météo (courbe de chauffe)
+Ormeaux B · Avenue des Ormeaux 15, 1212 Grand-Lancy
+
+Depuis 11 jours, la chaufferie produit +14 % de chaleur par rapport à l'attendu, à température extérieure comparable.
+
+Consigne — Chauffagiste, sous 1 semaine : Vérifier la pente et le décalage de la courbe de chauffe, la consigne de départ et la sonde extérieure.
+
+Votre avis :
+Pertinente
+Déjà connue
+Fausse alerte
+Dérive constatée : ≈ 246 CHF
+2 047 kWh depuis le 31.10.2026 (271 heures mesurées) · rythme ≈ 643 CHF/mois (sur 11 jours) · Projection si rien n'est fait : ≈ 5 843 CHF sur 12 mois (hypothèse : climat normal de Genève, MétéoSuisse GVE 2016-2025)
+Confiance 89 %
+Imputation : Charges locataires (décompte de chauffage)
+Créer le bon de travaux
