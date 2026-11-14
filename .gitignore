@@ -7,6 +7,9 @@
 # Résultats de la dernière analyse (régénérés à chaque analyse)
 /sorties/
 
+# Espaces des services tiers : leurs bases, leurs sorties et le registre des clés API
+/espaces/
+
 # Jeux de données : à déposer localement dans donnees/ (lot communal, CC BY 4.0, non redistribué ici)
 /donnees/*
 !/donnees/.gitkeep

@@ -16,13 +16,14 @@ chaque fichier et les règles à respecter. La documentation fonctionnelle compl
 
 ```bash
 pip install -r requirements.txt
-python -m unittest discover -s tests        # 281 tests, ~120 s, doivent rester verts (2 ignorés hors DPAPI Windows)
+python -m unittest discover -s tests        # 287 tests, ~120 s, doivent rester verts (2 ignorés hors DPAPI Windows)
 python -m vigie interface                   # interface sur vigie.db → http://127.0.0.1:8765
 python -m vigie interface --demo            # interface sur la base d'exemple vigie_demo.db
 python -m vigie analyser                    # détection sur vigie.db, écrit sorties/
 python -m vigie importer-patrimoine <classeur.xlsx> [--apercu]
 python -m vigie importer-courbes <fichier.csv|.xlsx> [...] [--apercu]
 python -m vigie mcp [--demo]                # serveur MCP en lecture seule (stdio) pour un assistant IA
+python -m vigie espace creer <id>           # espace d'un service tiers + clé API (aussi : lister, revoquer <id>)
 ```
 
 Toutes les sous-commandes sont listées dans la docstring de `vigie/__main__.py`.
@@ -46,7 +47,8 @@ xread-derives/
 │   ├── acces.py               lecture seule sans identification, session par mot de passe (VIGIE_MOT_DE_PASSE)
 │   ├── planification.py       analyse automatique (toutes les N heures, après un relevé API)
 │   ├── service.py             enchaînement partagé CLI/web : référentiel → moteur → sorties → alertes → bons
-│   ├── mcp.py                 serveur MCP (stdio, JSON-RPC) : le moteur interrogé par un assistant IA, lecture seule
+│   ├── mcp.py                 serveur MCP (stdio, et HTTP sur /mcp) : le moteur interrogé par un assistant IA, lecture seule
+│   ├── espaces.py             services tiers : clé API → espace (base isolée espaces/<id>/), routes interdites
 │   │
 │   │   Détection (le cœur métier)
 │   ├── moteur.py              qualité → attendu → détecteurs → impact → priorisation → consignes
@@ -96,7 +98,7 @@ xread-derives/
 │   ├── commun.py              base d'exemple créée une fois puis copiée pour chaque test
 │   └── test_*.py              bons, chiffrage, connecteur, fluides, geo, historique, historique_fluides,
 │                              import_mesures, meteo, methodes_par_pas, onduleur, pac, parc, patrimoine,
-│                              mcp, rejeu, serveur, solaire (aucun accès réseau, aucun courriel réel)
+│                              mcp, espaces, rejeu, serveur, solaire (aucun accès réseau, aucun courriel réel)
 │
 ├── evaluation/                ─── CAMPAGNE D'ÉVALUATION ET DOCUMENTS PDF (hors application) ───
 │   ├── campagne.py · analyse.py · figures.py   simulation → métriques → figures
@@ -117,7 +119,7 @@ xread-derives/
 └── donnees/                   jeux de données du lot communal, déposés localement (NON versionnés)
 ```
 
-**Non versionnés (`.gitignore`)** : `*.db` (`vigie.db`, `vigie_demo.db`), `sorties/` (régénéré à chaque analyse),
+**Non versionnés (`.gitignore`)** : `*.db` (`vigie.db`, `vigie_demo.db`), `sorties/` (régénéré à chaque analyse), `espaces/`,
 `donnees/*`, `.venv/`, `.env*`. `video-teaser/` (projet Remotion de vidéo promotionnelle, Node) est hors application.
 
 ## Flux de données
@@ -158,11 +160,13 @@ Les numéros sont ceux cités dans les commentaires du code.
 4. **Règle 6 : une seule alerte par fluide et par immeuble** : la règle la plus fine l'emporte.
 5. **Règle 3 : une donnée météo absente ou figée doit se voir** dans l'interface.
 6. **Règle 9 : aucune donnée de consommation ne quitte le serveur.** Seuls accès sortants autorisés : MétéoSuisse,
-   géocodeur fédéral, tuiles swisstopo, fournisseur API configuré (identifiants et période seulement).
+   géocodeur fédéral, tuiles swisstopo, fournisseur API configuré (identifiants et période seulement). Exception : un
+   service tiers relit, avec sa clé API, les données qu'il a lui-même envoyées dans son espace (`espaces.py`) ; une clé
+   n'ouvre jamais la base principale, et rien ne sort au nom d'un espace (ni courriel, ni connecteur).
 7. **Pas de nouvelle dépendance** sans nécessité : bibliothèque standard + pandas/numpy (ex. `excel.py` lit le xlsx
    lui-même). Pas de framework ni d'étape de build côté web.
 8. **Sécurité du serveur à préserver** : contrôle de l'en-tête `Host` (127.0.0.1/localhost), en-tête `X-Vigie` exigé
-   pour toute écriture, CSP stricte sans ressource externe (hors tuiles swisstopo), SQL toujours paramétré.
+   pour toute écriture sans clé API d'espace, CSP stricte sans ressource externe (hors tuiles swisstopo), SQL toujours paramétré.
 9. **Interface** : texte inséré avec `textContent` / `h()`, jamais `innerHTML` ; couleurs via les jetons CSS de
    `app.css`.
 10. Modules gardés autour de **800 lignes maximum** (d'où l'extraction de `regles.py` depuis `moteur.py`).

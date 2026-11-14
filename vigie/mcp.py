@@ -5,6 +5,8 @@
 
 Transport « stdio » : un message JSON-RPC 2.0 par ligne sur l'entrée standard, les réponses sur la sortie standard
 (bibliothèque standard uniquement). Le serveur n'ouvre aucun port et n'appelle aucun service.
+Transport HTTP : POST /mcp du serveur web, avec la clé API d'un espace de service tiers (espaces.py) ; les outils
+lisent alors la base de cet espace et elle seule (repondre_http).
 
 LECTURE SEULE : aucun outil ne modifie la base, n'envoie de bon ni ne change un réglage. « analyser_a_blanc » calcule
 la détection sans rien enregistrer (les alertes en base ne bougent que par l'interface ou `python -m vigie analyser`).
@@ -180,6 +182,21 @@ def traiter(app, message):
     else:
         reponse["error"] = {"code": -32601, "message": f"Méthode inconnue : {methode}"}
     return reponse
+
+
+def repondre_http(app, corps):
+    """Transport HTTP (« Streamable HTTP » sans flux SSE) : un message JSON-RPC, ou un lot, par requête POST.
+
+    Rend (code HTTP, réponse) ; réponse None (202) quand le client n'en attend pas (notification, réponse)."""
+    try:
+        message = json.loads(corps or b"null")
+    except ValueError:
+        return 400, {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "JSON illisible."}}
+    if isinstance(message, list):  # lot de messages (protocole 2025-03-26)
+        reponse = [r for r in (traiter(app, m) for m in message) if r is not None] or None
+    else:
+        reponse = traiter(app, message)
+    return (202, None) if reponse is None else (200, reponse)
 
 
 def servir(chemin_base, entree=None, sortie=None):

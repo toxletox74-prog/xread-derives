@@ -23,6 +23,10 @@
   python -m vigie reprendre-prestataires ancienne_base.db
                                          reprend la liste des prestataires d'une autre base Vigie dans vigie.db
   python -m vigie mcp [--demo]           serveur MCP en lecture seule pour un assistant IA (stdio, voir docs/API.md)
+  python -m vigie espace creer <id> [--nom="Service X"]
+                                         espace d'un service tiers (base isolée) et nouvelle clé API, affichée une fois
+  python -m vigie espace lister          espaces et clés (actives, révoquées), sans les clés elles-mêmes
+  python -m vigie espace revoquer <id>   révoque les clés de l'espace (sa base est gardée)
 """
 import os
 import sys
@@ -184,6 +188,29 @@ def importer_courbes(argv):
         _afficher_anomalies(r)
 
 
+def espace(argv, dossier=None):
+    """Espaces des services tiers : création et clé, liste, révocation (voir vigie/espaces.py)."""
+    from . import espaces
+    reg = espaces.Espaces(dossier or os.path.join(service.RACINE, "espaces"))
+    action, ident = (argv[2] if len(argv) > 2 else ""), (argv[3] if len(argv) > 3 else "")
+    if action == "creer" and ident:
+        nom = next((a.split("=", 1)[1] for a in argv if a.startswith("--nom=")), None)
+        try:
+            cle = reg.creer(ident, nom)
+        except espaces.ErreurEspace as e:
+            sys.exit(str(e))
+        print(f"Espace {ident} : {reg.base(ident)}")
+        print(f"Clé API (affichée une seule fois, à transmettre au service) :\n{cle}")
+    elif action == "lister":
+        for c in reg.lister():
+            etat = f"révoquée le {c['revoquee']}" if c["revoquee"] else "active"
+            print(f"  {c['espace']:<20} {c['nom'] or '':<24} créée le {c['creee']}  {etat}")
+    elif action == "revoquer" and ident:
+        print(f"Espace {ident} : {reg.revoquer(ident)} clé(s) révoquée(s). La base de l'espace est conservée.")
+    else:
+        print('Usage : python -m vigie espace creer <id> [--nom="…"] | lister | revoquer <id>')
+
+
 def main(argv):
     cmd = argv[1] if len(argv) > 1 else "interface"
     if cmd == "interface":
@@ -202,6 +229,8 @@ def main(argv):
             with contextlib.redirect_stdout(sys.stderr):  # la sortie standard est réservée au protocole
                 creer_demo().close()
         mcp.servir(BASE_DEMO if demo else BASE)
+    elif cmd == "espace":
+        espace(argv)
     elif cmd == "demo":
         cx = creer_demo(meteo_reelle="--meteo-fictive" not in argv, taille="standard" if "--petit" in argv else "grand")
         _afficher(service.analyser(cx))

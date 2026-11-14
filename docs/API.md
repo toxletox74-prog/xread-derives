@@ -5,6 +5,9 @@ Deux accès programmatiques au même moteur :
 1. l'**API JSON** du serveur local (`vigie/serveur.py`), celle qu'utilise l'interface web ;
 2. le **serveur MCP** (`vigie/mcp.py`), qui expose le moteur de dérives à un assistant IA, en lecture seule.
 
+Les deux sont ouverts aux **services tiers** par une clé API : chaque service a son espace, une base isolée où il
+importe ses relevés et obtient l'analyse de ses dérives (section 3).
+
 Un test (`tests/test_mcp.py`) vérifie que chaque route et chaque outil MCP figure dans ce document.
 
 ## 1. API JSON
@@ -21,7 +24,8 @@ Un test (`tests/test_mcp.py`) vérifie que chaque route et chaque outil MCP figu
 **Protections** (à respecter par tout client) :
 
 - l'en-tête `Host` doit valoir `127.0.0.1` ou `localhost` (sinon `403`) ;
-- toute requête autre que `GET` doit porter l'en-tête `X-Vigie: 1` (sinon `403`) ;
+- toute requête autre que `GET` doit porter l'en-tête `X-Vigie: 1` (sinon `403`), sauf avec une clé API d'espace
+  (section 3) ;
 - **lecture seule sans identification** dès qu'un mot de passe est défini (variable `VIGIE_MOT_DE_PASSE`) ou que la
   requête arrive par un serveur frontal (en-têtes `X-Forwarded-*`) : toute écriture, ainsi que la lecture de
   `/api/reglages` et `/api/connecteur`, exigent alors une session (témoin `vigie_session`, 12 h) ; sinon `401`.
@@ -174,6 +178,7 @@ python -m vigie mcp           # vigie.db
 ```
 
 - **Transport stdio**, JSON-RPC 2.0, un message par ligne. Aucun port ouvert, aucun appel réseau, aucune dépendance.
+  Également servi sur HTTP (`POST /mcp`) aux services tiers munis d'une clé, sur leur espace (section 3).
 - **Lecture seule.** Aucun outil ne modifie la base, n'envoie de bon, ne change un réglage. Les décisions (valider un
   bon, mettre une alerte en sourdine, régler un seuil) restent dans l'interface.
 - **Règle 5.** Les chiffres renvoyés sont ceux du moteur ; les consignes du serveur demandent à l'assistant de les
@@ -223,3 +228,75 @@ Claude Desktop ou tout autre client (fichier de configuration MCP) :
 
 `lancer_vigie.py` fonctionne depuis n'importe quel dossier ; avec un environnement virtuel, donner le chemin de son
 interpréteur Python à la place de `python`.
+
+Client MCP distant (transport HTTP, section 3) :
+
+```json
+{
+  "mcpServers": {
+    "xread-derives": {
+      "type": "http",
+      "url": "https://xread-derive.brochardbenjamin.com/mcp",
+      "headers": {"Authorization": "Bearer vgk_…"}
+    }
+  }
+}
+```
+
+## 3. Services tiers : espaces et clés API
+
+Un service tiers (application, plateforme de télérelève, assistant IA hébergé) utilise le moteur sur **ses propres
+données**. Il reçoit une clé API liée à un **espace** : une base Vigie isolée (`espaces/<id>/vigie.db`, sorties dans
+`espaces/<id>/sorties/`). Il y importe son parc et ses relevés, lance l'analyse et lit ses dérives. Il ne voit jamais
+la base principale ni l'espace d'un autre service.
+
+### Clés
+
+Sur le serveur :
+
+```bash
+python -m vigie espace creer acme --nom="ACME Énergie"   # crée l'espace et affiche une nouvelle clé (une seule fois)
+python -m vigie espace lister                            # espaces et clés actives ou révoquées
+python -m vigie espace revoquer acme                     # révoque les clés de l'espace (la base est gardée)
+```
+
+La clé (`vgk_…`) n'est affichée qu'à sa création ; le registre (`espaces/registre.db`) ne garde que son empreinte
+SHA-256. Pour changer de clé : `creer` sur le même espace (nouvelle clé, mêmes données), puis `revoquer` l'ancienne
+si besoin (`revoquer` les révoque toutes).
+
+### Appels
+
+Toute requête qui porte `Authorization: Bearer <clé>` travaille sur l'espace de la clé, en lecture **et** en écriture :
+mêmes routes et mêmes réponses que la section 1, sans session ni en-tête `X-Vigie`. Clé absente, inconnue ou
+révoquée : `401`.
+
+```bash
+CLE="vgk_…" ; URL="https://xread-derive.brochardbenjamin.com"
+curl -H "Authorization: Bearer $CLE" --data-binary @parc.xlsx "$URL/api/import/parc?appliquer=1"
+curl -H "Authorization: Bearer $CLE" --data-binary @releves.csv "$URL/api/import/mesures"
+curl -H "Authorization: Bearer $CLE" -X POST "$URL/api/meteo/maj"     # température MétéoSuisse de l'espace
+curl -H "Authorization: Bearer $CLE" -X POST "$URL/api/analyser"
+curl -H "Authorization: Bearer $CLE" "$URL/api/alertes"
+```
+
+Parcours type : parc (`/api/import/parc` ou `/api/import/patrimoine`), relevés (`/api/import/mesures` ou
+`/api/import/courbes`), météo (`POST /api/meteo/maj` : la mise à jour automatique toutes les 3 h et l'analyse
+planifiée ne tournent que pour la base principale), analyse (`POST /api/analyser`), puis alertes et bons.
+
+**Routes interdites aux espaces** (`403`) : `/api/session`, `/api/reglages` (messagerie), `/api/connecteur…`
+(fournisseur de télérelève), `/api/exemple`, `POST /api/bons/{id}/envoyer` et `/demo-fournisseur/…`. Rien ne sort
+du serveur au nom d'un espace : ni courriel, ni appel à un fournisseur. Les bons se préparent et se lisent
+(`GET /api/bons/{id}/eml`), le service les transmet lui-même.
+
+### MCP sur HTTP
+
+`POST /mcp` avec la clé : un message JSON-RPC (ou un lot) par requête, réponse `application/json` ; `202` sans corps
+pour une notification. Transport « Streamable HTTP » sans flux SSE ni session (`GET /mcp` : `405`). Mêmes outils en
+lecture seule que la section 2, sur la base de l'espace de la clé.
+
+```bash
+curl -H "Authorization: Bearer $CLE" -H "Content-Type: application/json"      -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"lister_alertes","arguments":{}}}' "$URL/mcp"
+```
+
+**Règle 9.** Les données d'un espace sont celles que le service a lui-même envoyées ; elles ne sont rendues qu'à qui
+présente sa clé. La base principale n'est jamais exposée par une clé.

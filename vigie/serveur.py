@@ -1,6 +1,7 @@
 """Serveur local de l'interface de gestion (bibliothèque standard uniquement).
 
-Écoute uniquement sur 127.0.0.1 : aucune donnée ne quitte le poste (règle 9). Protections :
+Écoute uniquement sur 127.0.0.1 : aucune donnée ne quitte le poste (règle 9), sauf celles qu'un service tiers a
+lui-même envoyées dans son espace, rendues à lui seul sur présentation de sa clé API (espaces.py). Protections :
   - en-tête Host vérifié (empêche le « DNS rebinding » depuis un site web malveillant) ;
   - toute requête qui modifie quelque chose doit porter l'en-tête X-Vigie (bloque les formulaires d'autres sites) ;
   - lecture seule sans identification dès qu'un mot de passe est défini ou qu'un serveur frontal relaie (acces.py) ;
@@ -19,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
 from . import acces, bons, connecteur, courbes, db, declarations, excel, geo, meteo, moteur, parc, patrimoine
-from . import planification, secret, service
+from . import espaces, planification, secret, service
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FICHIER_WEB_RE = re.compile(r"^/([a-z_]+\.(?:js|css|html))$")  # fichiers plats de vigie/web, sans sous-dossier
@@ -51,8 +52,9 @@ class Reponse:
 class Application:
     """État partagé du serveur : une connexion SQLite protégée par un verrou."""
 
-    def __init__(self, chemin_base):
+    def __init__(self, chemin_base, sortie=None):
         self.chemin = chemin_base
+        self.sortie = sortie  # None : sorties/ du projet ; dossier propre pour un espace de service tiers
         self.cx = db.connecter(chemin_base)
         self.verrou = threading.Lock()
         self.mot_de_passe = None  # mot de passe SMTP : en mémoire seulement, jamais écrit sur disque
@@ -415,7 +417,7 @@ class Application:
         return {**meteo.mettre_a_jour(self.cx), "etat": meteo.etat(self.cx)}
 
     def analyser(self, req):
-        res = service.analyser(self.cx, self.mot_de_passe)
+        res = service.analyser(self.cx, self.mot_de_passe, sortie=self.sortie)
         return {"donnees_au": res["donnees_au"], "alertes": len(res["alertes"]), "nouvelles": res["nouvelles"],
                 "bons": res["bons"]}
 
@@ -437,14 +439,17 @@ class Application:
     def import_patrimoine(self, req):
         """Classeur patrimoine (sites, bâtiments, compteurs, relevés mensuels) : aperçu, ou import si appliquer=1."""
         appliquer = (req.query.get("appliquer") or ["0"])[0] == "1"
-        return self._rapport_import(patrimoine.importer(self.cx, req.corps(), appliquer, service.SORTIE if appliquer else None))
+        return self._rapport_import(patrimoine.importer(self.cx, req.corps(), appliquer, self._sortie() if appliquer else None))
 
     def import_courbes(self, req):
         """Courbes fines (jour, heure, quart d'heure) en CSV, ou calendrier d'un classeur : aperçu, ou import."""
         appliquer = (req.query.get("appliquer") or ["0"])[0] == "1"
         nom = os.path.basename((req.query.get("nom") or ["courbes.csv"])[0])[:80] or "courbes.csv"
         return self._rapport_import(courbes.importer(self.cx, req.corps(), nom, appliquer,
-                                                     service.SORTIE if appliquer else None))
+                                                     self._sortie() if appliquer else None))
+
+    def _sortie(self):
+        return self.sortie or service.SORTIE
 
     @staticmethod
     def _rapport_import(r):
@@ -590,6 +595,7 @@ def serie_journaliere(cx, pid, jours):
 
 class Gestionnaire(BaseHTTPRequestHandler):
     app = None  # Application, injectée par creer_serveur()
+    espaces = None  # espaces.Espaces des services tiers, injecté par creer_serveur()
     server_version = "Vigie"
 
     def log_message(self, fmt, *args):  # console sobre : seules les erreurs sont affichées
@@ -637,6 +643,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         self.query = parse_qs(url.query)
         chemin = unquote(url.path)
+        cle = espaces.jeton(self.headers)
+        if cle is not None or chemin == "/mcp":
+            return self._traiter_espace(methode, chemin, cle)
         if methode == "GET" and (chemin == "/" or FICHIER_WEB_RE.match(chemin)):
             nom = "index.html" if chemin == "/" else FICHIER_WEB_RE.match(chemin).group(1)
             if os.path.isfile(os.path.join(WEB, nom)):
@@ -645,12 +654,32 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._json(403, {"erreur": "Requête refusée."})
         if acces.reserve(methode, chemin) and not self.app.acces.autorise(self.headers):
             return self._json(401, {"erreur": acces.MESSAGE})
-        for m, motif, fonction in self.app.routes:
+        return self._executer(self.app, methode, chemin)
+
+    def _traiter_espace(self, methode, chemin, cle):
+        """Service tiers : sa clé API ouvre son espace (espaces.py), en lecture et en écriture, et lui seul."""
+        espace = self.espaces.espace_de(cle)
+        if espace is None:
+            return self._json(401, {"erreur": espaces.MESSAGE_CLE}, {"WWW-Authenticate": "Bearer"})
+        app = self.espaces.application(espace)
+        if chemin == "/mcp":
+            from . import mcp  # import tardif : mcp importe ce module
+            if methode != "POST":
+                return self._json(405, {"erreur": "MCP : requêtes POST uniquement (pas de flux SSE)."}, {"Allow": "POST"})
+            with app.verrou:
+                code, reponse = mcp.repondre_http(app, self.corps())
+            return self._envoyer(code, b"", "application/json") if reponse is None else self._json(code, reponse)
+        if espaces.interdite(chemin):
+            return self._json(403, {"erreur": espaces.MESSAGE_INTERDITE})
+        return self._executer(app, methode, chemin)
+
+    def _executer(self, app, methode, chemin):
+        for m, motif, fonction in app.routes:
             res = re.fullmatch(motif, chemin) if m == methode else None
             if not res:
                 continue
             try:
-                with contextlib.nullcontext() if fonction.__name__ in SANS_VERROU else self.app.verrou:
+                with contextlib.nullcontext() if fonction.__name__ in SANS_VERROU else app.verrou:
                     resultat = fonction(self, *res.groups())
             except ERREURS_METIER as e:
                 return self._json(400, {"erreur": str(e)})
@@ -752,9 +781,10 @@ class ServeurVigie(ThreadingHTTPServer):
     daemon_threads = True
 
 
-def creer_serveur(chemin_base, port=8765):
+def creer_serveur(chemin_base, port=8765, dossier_espaces=None):
     app = Application(chemin_base)
-    gestionnaire = type("GestionnaireVigie", (Gestionnaire,), {"app": app})
+    tiers = espaces.Espaces(dossier_espaces or os.path.join(service.RACINE, "espaces"))
+    gestionnaire = type("GestionnaireVigie", (Gestionnaire,), {"app": app, "espaces": tiers})
     return ServeurVigie(("127.0.0.1", port), gestionnaire), app
 
 
