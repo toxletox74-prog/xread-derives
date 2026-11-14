@@ -6,10 +6,14 @@ import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-html = (ROOT.parent / 'vigie/web/index.html').read_text(encoding='utf-8')
-logo = re.search(r'<svg class="logo".*?</svg>', html, re.S).group(0)
-logo = logo.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')
-(ROOT / 'public/assets/logo.svg').write_text(logo, encoding='utf-8')
+source_logo = ROOT.parent / 'vigie/web/index.html'
+if source_logo.exists():
+    html = source_logo.read_text(encoding='utf-8')
+    logo = re.search(r'<svg class="logo".*?</svg>', html, re.S).group(0)
+    logo = logo.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')
+    (ROOT / 'public/assets/logo.svg').write_text(logo, encoding='utf-8')
+elif not (ROOT / 'public/assets/logo.svg').exists():
+    raise FileNotFoundError('Ajouter le logo dans public/assets/logo.svg.')
 
 rate = 24000
 notes = [146.8324, 174.6141, 130.8128, 164.8138]
@@ -23,7 +27,7 @@ for i in range(60 * rate):
     kick = math.sin(2 * math.pi * (48 * beat + 3 * (1-math.exp(-beat*22)))) * math.exp(-beat * 20) * .08
     air = math.sin(2*math.pi*3181*t)*math.sin(2*math.pi*4783*t)*math.exp(-beat*65)*.014
     cue = 0
-    for start in [8,20,35,50]:
+    for start in [8,16,26,38,51]:
         dt=t-start
         if 0 <= dt < 1.4:
             cue += math.sin(2*math.pi*880*dt)*math.exp(-dt*5)*.045
