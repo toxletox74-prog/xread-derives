@@ -6,7 +6,7 @@ import unittest
 
 from commun import base_exemple
 
-from vigie import excel, serveur
+from vigie import acces, excel, serveur
 
 
 class TestServeur(unittest.TestCase):
@@ -97,6 +97,57 @@ class TestServeur(unittest.TestCase):
     def test_ecriture_sans_en_tete_x_vigie_refusee(self):
         statut, _ = self.json("POST", "/api/analyser", entetes={"X-Vigie": "0"})
         self.assertEqual(statut, 403)
+
+    def test_poste_local_sans_mot_de_passe_tout_est_permis(self):
+        _, e = self.json("GET", "/api/etat")
+        self.assertEqual(e["acces"], {"ecriture": True, "connexion": False, "session": False})
+
+    def test_lecture_seule_derriere_un_serveur_frontal_sans_mot_de_passe(self):
+        frontal = {"X-Forwarded-For": "203.0.113.7"}
+        statut, e = self.json("GET", "/api/etat", entetes=frontal)
+        self.assertEqual((statut, e["acces"]["ecriture"], e["acces"]["connexion"]), (200, False, False))
+        self.assertEqual(self.json("GET", "/api/parc", entetes=frontal)[0], 200)
+        statut, r = self.json("POST", "/api/analyser", entetes=frontal)
+        self.assertEqual(statut, 401)
+        self.assertIn("Lecture seule", r["erreur"])
+        self.assertEqual(self.json("POST", "/api/session", {"mot_de_passe": ""}, entetes=frontal)[0], 401)
+
+    def test_lecture_seule_sans_identification_puis_session(self):
+        app = self.srv.RequestHandlerClass.app
+        ancien, app.acces = app.acces, acces.Acces("sésame-ouvre-toi")
+        self.addCleanup(setattr, app, "acces", ancien)
+        self.addCleanup(setattr, acces, "DELAI_ECHEC_S", acces.DELAI_ECHEC_S)
+        acces.DELAI_ECHEC_S = 0
+        # sans session : la consultation reste libre, les écritures et les réglages sensibles sont refusés
+        for chemin in ("/api/etat", "/api/parc", "/api/alertes", "/api/carte", "/api/regles", "/"):
+            self.assertEqual(self.req("GET", chemin)[0], 200, chemin)
+        refusees = [("POST", "/api/analyser"), ("DELETE", "/api/immeubles/T8"), ("PUT", "/api/reglages"),
+                    ("POST", "/api/import/mesures"), ("DELETE", "/api/session"), ("GET", "/api/reglages"),
+                    ("GET", "/api/connecteur")]
+        for methode, chemin in refusees:
+            self.assertEqual(self.req(methode, chemin)[0], 401, chemin)
+        self.assertEqual(self.json("POST", "/api/session", {"mot_de_passe": "faux"})[0], 401)
+        # ouverture de session : témoin HttpOnly, puis tout est permis avec lui
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=60)
+        c.request("POST", "/api/session", body=json.dumps({"mot_de_passe": "sésame-ouvre-toi"}),
+                  headers={"Host": f"127.0.0.1:{self.port}", "X-Vigie": "1", "X-Forwarded-Proto": "https"})
+        r = c.getresponse()
+        temoin = r.getheader("Set-Cookie")
+        r.read()
+        c.close()
+        self.assertEqual(r.status, 200)
+        for attribut in ("HttpOnly", "SameSite=Strict", "Secure"):
+            self.assertIn(attribut, temoin)
+        session = {"Cookie": temoin.split(";")[0]}
+        _, e = self.json("GET", "/api/etat", entetes=session)
+        self.assertEqual(e["acces"], {"ecriture": True, "connexion": True, "session": True})
+        self.assertEqual(self.req("GET", "/api/reglages", entetes=session)[0], 200)
+        self.assertEqual(self.req("POST", "/api/analyser", entetes=session)[0], 200)
+        self.assertEqual(self.req("POST", "/api/analyser", entetes={"Cookie": "vigie_session=invente"})[0], 401)
+        # l'en-tête X-Vigie reste exigé, session ou non ; la déconnexion ferme la session
+        self.assertEqual(self.req("POST", "/api/analyser", entetes={**session, "X-Vigie": "0"})[0], 403)
+        self.assertEqual(self.req("DELETE", "/api/session", entetes=session)[0], 200)
+        self.assertEqual(self.req("POST", "/api/analyser", entetes=session)[0], 401)
 
     def test_etat_et_analyse(self):
         statut, r = self.json("POST", "/api/analyser")

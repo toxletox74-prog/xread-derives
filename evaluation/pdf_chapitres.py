@@ -41,8 +41,9 @@ def chaine(c):
         "<b>Jour jugé</b> : jour civil UTC des heures en fin d'intervalle ; le jour en cours (incomplet) n'est jamais "
         f"jugé. Un jour n'est jugé que si au moins {moteur.JOUR_HEURES_MIN} heures sur 24 sont mesurées, et ses seuils "
         "sont alors comparés au prorata des heures mesurées.",
-        f"<b>Nuit</b> : heures dont la fin tombe dans ]{P['heures_nuit'][0]} h ; {P['heures_nuit'][1]} h] UTC, soit "
-        "1 h-5 h UTC (2 h-6 h l'hiver et 3 h-7 h l'été en heure de Genève), donc 4 relevés horaires par nuit.",
+        f"<b>Nuit</b> : heures dont la fin tombe dans ]{P['heures_nuit'][0]} h ; {P['heures_nuit'][1]} h] à l'heure de "
+        "Zurich (0 h-4 h UTC l'hiver, 23 h-3 h UTC l'été), donc 4 relevés horaires par nuit (3 ou 5 aux changements "
+        "d'heure).",
         "<b>Persistance</b> : nombre de jours (ou de nuits) consécutifs jugés au-delà du seuil, comptés depuis le "
         "dernier jour complet. Un jour ou une nuit non jugé (données insuffisantes) est sauté : il ne casse pas la "
         "série et ne la prolonge pas."])
@@ -118,7 +119,7 @@ def donnees_fluides(c):
     out += c.tableau(lignes, [42 * M.mm, 70 * M.mm, M.UTILE - 112 * M.mm], "Règles utilisables selon le pas du "
                      "relevé ; l'interface signale un compteur plus grossier que l'heure (« pas trop grossier »)")
     out.append(c.h3("Lois de simulation (générateur d'exemple et simulateur de la campagne)"))
-    lignes = [["Fluide", "Loi simulée (L = logements, occ = taux d'occupation, T = température, h = heure UTC)", "Bruit"],
+    lignes = [["Fluide", "Loi simulée (L = logements, occ = taux d'occupation, T = température, h = heure de Zurich)", "Bruit"],
               ["Chaleur (heure)", "0,22·L·max(0 ; 16 − T)·r + 0,12·L, avec r = 0,8 de 22 h à 5 h (abaissement nocturne)",
                "× U(0,95 ; 1,05)"],
               ["PAC (heure)", "chaleur 0,22·L·(0,6 + 0,4·occ)·max(0 ; 16 − T)·r + eau chaude 0,12·L·occ ; électricité = "

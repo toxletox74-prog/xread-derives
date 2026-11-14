@@ -21,9 +21,11 @@ BON_OUVERT = ("brouillon", "envoye", "en_cours", "retour")
 RESULTATS_RETOUR = {"resolu": "Problème résolu", "non_resolu": "Problème non résolu", "a_suivre": "À suivre (2e passage)",
                     "rien_trouve": "Rien constaté sur place"}
 SUIVIS = {"en_attente": "En attente", "bon_envoye": "Bon envoyé", "retour_incident": "Retour d'incident",
-          "a_verifier": "Intervention faite, dérive encore mesurée", "cloturee": "Clôturée"}
+          "a_verifier": "Intervention faite, dérive encore mesurée", "cloturee": "Clôturée",
+          "sourdine": "En sourdine"}  # dérive mesurée mais mise en sourdine par une déclaration (vigie/declarations.py)
 ORDRE_GRAVITE = {"Critique": 3, "Élevée": 2, "Modérée": 1, "Données": 0}
-AUTOMATISATION_DEFAUT = {"mode": "brouillon", "gravite_min": "Élevée", "inclure_donnees": True}
+AUTOMATISATION_DEFAUT = {"mode": "brouillon", "gravite_min": "Élevée", "inclure_donnees": True,
+                         "analyse_auto": False, "analyse_intervalle_h": 6}  # analyse planifiée : planification.py
 MESSAGERIE_DEFAUT = {"expediteur_nom": "", "expediteur_email": "", "copie_a": "", "signature": "",
                      "smtp_hote": "", "smtp_port": 587, "smtp_utilisateur": "", "smtp_securite": "starttls"}
 ENV_MOT_DE_PASSE = "VIGIE_SMTP_MOT_DE_PASSE"
@@ -60,6 +62,8 @@ def synchroniser_alertes(cx, alertes):
 
     Une alerte est identifiée par immeuble + cause (+ point pour les données) : la même dérive détectée
     à chaque analyse reste UNE alerte. Une alerte qui n'est plus détectée passe à « résolue ».
+    Une alerte en sourdine (déclaration) est enregistrée et tracée, mais n'est pas « nouvelle » : aucun bon n'est
+    préparé. À l'échéance de la sourdine, si la dérive est toujours mesurée, elle le devient.
     """
     t = maintenant()
     existantes = {r["id"]: r for r in db.lignes(cx, "SELECT id, statut, immeuble_id, donnees FROM alerte")}
@@ -68,21 +72,28 @@ def synchroniser_alertes(cx, alertes):
         vues.add(a["id"])
         donnees = json.dumps(a, ensure_ascii=False, default=str)
         ex = existantes.get(a["id"])
+        muette = f" (en sourdine jusqu'au {_date_fr(a['sourdine']['jusquau'])})" if a.get("sourdine") else ""
         if ex is None:
             cx.execute("INSERT INTO alerte (id, immeuble_id, point_id, cause, gravite, statut, ouverte_le, "
                        "derniere_detection, donnees) VALUES (?,?,?,?,?, 'ouverte', ?, ?, ?)",
                        (a["id"], a["immeuble_id"], a.get("point_id"), a["cause"], a["gravite"], t, t, donnees))
-            evenement(cx, a["immeuble_id"], "alerte_ouverte", f"Alerte {a['gravite'].lower()} : {a['titre']}", a["id"], le=t)
-            nouvelles.append(a["id"])
+            evenement(cx, a["immeuble_id"], "alerte_ouverte", f"Alerte {a['gravite'].lower()} : {a['titre']}{muette}",
+                      a["id"], le=t)
         elif ex["statut"] == "resolue":
             cx.execute("UPDATE alerte SET statut = 'ouverte', ouverte_le = ?, derniere_detection = ?, cloturee_le = NULL,"
                        " retour = NULL, retour_le = NULL, gravite = ?, donnees = ? WHERE id = ?",
                        (t, t, a["gravite"], donnees, a["id"]))
-            evenement(cx, a["immeuble_id"], "alerte_rouverte", f"Dérive de nouveau mesurée : {a['titre']}", a["id"], le=t)
-            nouvelles.append(a["id"])
+            evenement(cx, a["immeuble_id"], "alerte_rouverte", f"Dérive de nouveau mesurée : {a['titre']}{muette}",
+                      a["id"], le=t)
         else:
             cx.execute("UPDATE alerte SET derniere_detection = ?, gravite = ?, donnees = ? WHERE id = ?",
                        (t, a["gravite"], donnees, a["id"]))
+            if muette or not json.loads(ex["donnees"]).get("sourdine"):
+                continue  # alerte déjà connue
+            evenement(cx, a["immeuble_id"], "alerte_rouverte", f"Fin de la sourdine, dérive toujours mesurée : {a['titre']}",
+                      a["id"], le=t)
+        if not muette:
+            nouvelles.append(a["id"])
     for aid, ex in existantes.items():
         if aid not in vues and ex["statut"] == "ouverte":
             cx.execute("UPDATE alerte SET statut = 'resolue', cloturee_le = ? WHERE id = ?", (t, aid))
@@ -93,17 +104,22 @@ def synchroniser_alertes(cx, alertes):
 
 
 def liste_alertes(cx, statut="ouverte"):
-    sql = "SELECT * FROM alerte" + (" WHERE statut = ?" if statut else "")
+    """Alertes « ouverte » (à traiter, hors sourdine), « sourdine » (ouvertes mais en sourdine), « resolue » ou toutes."""
+    en_base = "ouverte" if statut == "sourdine" else statut
+    sql = "SELECT * FROM alerte" + (" WHERE statut = ?" if en_base else "")
     out = []
-    for r in db.lignes(cx, sql, (statut,) if statut else ()):
+    for r in db.lignes(cx, sql, (en_base,) if en_base else ()):
         a = json.loads(r.pop("donnees"))
+        muette = r["statut"] == "ouverte" and bool(a.get("sourdine"))
+        if statut in ("ouverte", "sourdine") and muette != (statut == "sourdine"):
+            continue
         a.update(statut=r["statut"], ouverte_le=r["ouverte_le"], derniere_detection=r["derniere_detection"],
                  cloturee_le=r["cloturee_le"], retour=r["retour"])
         bon = db.lignes(cx, "SELECT id, numero, statut, destinataire_type, destinataire_nom, destinataire, cree_le, "
                             "envoye_le, retour_resultat, retour_texte, retour_le, cloture_le FROM bon "
                             "WHERE alerte_id = ? ORDER BY id DESC LIMIT 1", (a["id"],))
         a["bon"] = bon[0] if bon else None
-        a["suivi"] = suivi(a["statut"], a["bon"])
+        a["suivi"] = "sourdine" if muette else suivi(a["statut"], a["bon"])
         out.append(a)
     out.sort(key=lambda a: (a["statut"] != "ouverte", a["gravite"] == "Données", -(a.get("score") or 0)))
     return out
@@ -277,10 +293,13 @@ def creer_bon(cx, alerte_id, prestataire_id=None, mode="manuel", destinataire_ty
     existant = bon_ouvert(cx, alerte_id)
     if existant:
         return lire_bon(cx, existant["id"]), False
-    r = db.lignes(cx, "SELECT donnees FROM alerte WHERE id = ?", (alerte_id,))
+    r = db.lignes(cx, "SELECT donnees, statut FROM alerte WHERE id = ?", (alerte_id,))
     if not r:
         raise ErreurBon("Alerte introuvable.")
     alerte = json.loads(r[0]["donnees"])
+    if r[0]["statut"] == "ouverte" and alerte.get("sourdine"):
+        raise ErreurBon(f"Alerte en sourdine jusqu'au {_date_fr(alerte['sourdine']['jusquau'])} : "
+                        f"{alerte['sourdine']['motif']}. Supprimez la déclaration pour préparer un bon.")
     if prestataire_id:
         pr = db.lignes(cx, "SELECT * FROM prestataire WHERE id = ?", (prestataire_id,))
         if not pr:
@@ -457,6 +476,16 @@ def smtp_configure(messagerie):
     return bool(messagerie.get("smtp_hote") and messagerie.get("expediteur_email"))
 
 
+def mot_de_passe_manquant(cx, mot_de_passe=None):
+    """Envoi automatique demandé mais voué à l'échec : SMTP avec utilisateur, sans mot de passe (règle 3 : à montrer).
+
+    Le mot de passe n'est gardé qu'en mémoire : il est perdu à chaque redémarrage s'il n'est pas dans l'environnement.
+    """
+    m = lire_messagerie(cx)
+    return bool(lire_automatisation(cx)["mode"] == "envoi" and smtp_configure(m) and m.get("smtp_utilisateur")
+                and not (mot_de_passe or os.environ.get(ENV_MOT_DE_PASSE)))
+
+
 def envoyer_bon(cx, bid, mot_de_passe=None, envoi=None):
     """Envoie le bon par SMTP. `envoi` permet de remplacer l'envoi réel (tests)."""
     bon = lire_bon(cx, bid)
@@ -513,9 +542,9 @@ def automatiser(cx, nouvelles, mot_de_passe=None, envoi=None):
         return resultat
     seuil = ORDRE_GRAVITE.get(auto["gravite_min"], 2)
     for aid in nouvelles:
-        r = db.lignes(cx, "SELECT gravite FROM alerte WHERE id = ?", (aid,))
-        if not r:
-            continue
+        r = db.lignes(cx, "SELECT gravite, donnees FROM alerte WHERE id = ?", (aid,))
+        if not r or json.loads(r[0]["donnees"]).get("cause_commune"):
+            continue  # cause commune à plusieurs immeubles (recoupement.py) : à vérifier, le bon reste manuel
         g = r[0]["gravite"]
         if g == "Données" and not auto["inclure_donnees"]:
             continue

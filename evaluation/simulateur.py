@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
-from vigie import db, generer_demo, moteur
+from vigie import calendrier, db, generer_demo, moteur
 
 MOTEUR = moteur  # moteur évalué (remplaçable par la copie figée « avant révision », voir campagne.py)
 
@@ -156,8 +156,9 @@ def simuler(sc, graine, meteo, avec_derive=True):
     rng = np.random.default_rng([graine, 11])
     heures = t_sim.index
     quarts = pd.date_range(debut + timedelta(minutes=15), periods=jours * 96, freq="15min")
-    hq = quarts.hour.to_numpy() + quarts.minute.to_numpy() / 60
-    hh = heures.hour.to_numpy()
+    # heure du jour des occupants et de la régulation : heure de Zurich, comme le moteur (la température reste en UTC)
+    hq = calendrier.locale(quarts).hour.to_numpy() + quarts.minute.to_numpy() / 60
+    hh = calendrier.locale(heures).hour.to_numpy()
     T = t_sim.to_numpy()
     typ, spec = sc["type"], TYPES[sc["type"]]
     L = spec["logements"]

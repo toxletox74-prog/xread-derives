@@ -13,95 +13,12 @@ import math
 import numpy as np
 import pandas as pd
 
-from . import calendrier, complements, historique, solaire
-from .db import FLUIDES_METEO, PAS_MENSUEL
+from . import calendrier, complements, declarations, historique, recoupement, solaire
 
 URGENCE = {"Critique": 3.0, "Élevée": 2.0, "Modérée": 1.0, "Données": 0.0}
 
-# ---------------------------------------------------------------- chargement
-
-
-PAS_HORAIRE = 60      # pas de temps de référence : les données arrivent au mieux à l'heure (CLAUDE.md §5)
-PAS_JOURNALIER = 1440  # relevé journalier : seules les règles journalières peuvent s'en servir
-
-
-def lire_brut(cx):
-    """Points et mesures brutes (horodatage UTC naïf), lus une seule fois : sert à l'analyse et au rejeu."""
-    pts = pd.read_sql("SELECT * FROM point_mesure", cx).set_index("id")
-    raw = pd.read_sql("SELECT ts, point_id, valeur, qualite FROM mesure", cx)
-    if not raw.empty:
-        raw["ts"] = pd.to_datetime(raw["ts"], utc=True).dt.tz_localize(None)
-    return pts, raw
-
-
-def charger_series(cx, jusqua=None, brut=None):
-    """Séries horaires (fin d'intervalle) des points au pas horaire ou plus fin, et séries journalières des points
-    relevés une fois par jour. Retourne (points, horaires, qualité, fin, journalières)."""
-    # `jusqua` : seules les mesures jusqu'à cette date sont vues (rejeu) ; `brut` = lire_brut(cx) déjà chargé
-    pts, raw = brut if brut is not None else lire_brut(cx)
-    if jusqua is not None and not raw.empty:
-        raw = raw[raw["ts"] <= jusqua]
-    if raw.empty:
-        return pts, {}, {}, None, {}
-    # Fin des données = dernier relevé d'un COMPTEUR : la météo, mise à jour toutes les 3 h, est souvent plus récente
-    # que les relevés importés ; la prendre comme fin ferait paraître tous les compteurs muets.
-    compteurs = raw[~raw["point_id"].isin(pts.index[pts["fluide"].isin(FLUIDES_METEO)])]
-    fin = (compteurs if not compteurs.empty else raw)["ts"].max()
-    series, qualite, journalieres = {}, {}, {}
-    for pid, g in raw.groupby("point_id"):
-        g = g.sort_values("ts").set_index("ts")
-        nature = pts.loc[pid, "nature"]
-        pas = float(pts.loc[pid, "pas_min"])
-        v = g["valeur"].where(g["qualite"] == "valide")  # ni suspecte, ni estimée par le distributeur (règle 4)
-        recul = 0
-        if nature == "index":
-            d = v.diff()
-            recul = int((d < 0).sum())
-            # Après un trou de relevés, l'écart d'index cumule toute la consommation du trou : on ne sait pas à
-            # quelle heure elle a eu lieu. Elle n'est attribuée à aucune heure (règle 4 : jamais de décision sur
-            # une valeur reconstituée). Sinon, une passerelle coupée la nuit simule une fuite.
-            ecart = pd.Series(v.index, index=v.index).diff()
-            v = d.where((d >= 0) & (ecart <= pd.Timedelta(minutes=1.5 * pas)))
-        if nature == "instantane":
-            series[pid] = v.resample("h", label="right", closed="right").mean()
-        elif pas <= PAS_HORAIRE:
-            r = v.resample("h", label="right", closed="right")
-            # Heure incomplète (un relevé de l'heure manquant si le pas est plus fin que l'heure) = valeur inconnue,
-            # pas une heure sous-estimée (règle 4). Au pas horaire : un relevé par heure.
-            series[pid] = r.sum(min_count=1).where(r.count() >= max(1, round(PAS_HORAIRE / pas)))
-        elif pas == PAS_JOURNALIER:
-            # Relevé journalier : sa consommation couvre 24 heures, elle n'est attribuée à aucune heure (la fuite de
-            # nuit, l'électricité de nuit et la PAC sont invisibles à ce pas). Jour = jour de fin d'intervalle - 1 s.
-            v = v.dropna()
-            journalieres[pid] = v.groupby((v.index - pd.Timedelta(seconds=1)).normalize()).sum(min_count=1)
-        # autre pas plus grossier que l'heure : aucune règle ne peut s'en servir (signalé dans la fiche du compteur)
-        debut30 = fin - pd.Timedelta(days=30)
-        attendu = 30 * 24 * 60 / pas
-        recus = (g.index > debut30).sum()
-        if pas >= PAS_MENSUEL:  # relevé mensuel : complétude sur 12 mois, depuis le premier relevé du compteur
-            debut12 = fin - pd.Timedelta(days=365)
-            recus = (g.index > debut12).sum()
-            # compteur relevé depuis moins d'un an : son premier relevé, puis un par mois CIVIL écoulé (un mois
-            # « moyen » de 30,44 jours attendait un relevé de trop le 31 du mois, la veille de son arrivée)
-            premier = g.index.min()
-            attendu = 12 if premier <= debut12 else (fin.year - premier.year) * 12 + fin.month - premier.month + 1
-        elif g.index.min() > debut30:  # série commencée il y a moins de 30 jours : jugée depuis son premier relevé
-            debut_serie = g.index.min() - pd.Timedelta(minutes=pas)
-            recus = (g.index > debut_serie).sum()
-            attendu = max(1.0, (fin - debut_serie).total_seconds() / 60 / pas)
-        qualite[pid] = {
-            "derniere": g.index.max(),
-            "nature": nature,
-            "completude": min(1.0, recus / attendu),
-            "index_recule": recul,
-            "suspectes": int((g["qualite"] == "suspecte").sum()),
-            "pas_min": pas,
-        }
-        if pts.loc[pid, "fluide"] == "solaire":  # production au-delà de la puissance crête : échelle ou unité fausse
-            kwc = pts.loc[pid].get("puissance_crete_kwc")
-            qualite[pid]["crete"] = (solaire.crete_depassee(series.get(pid), kwc, debut30), kwc)
-            qualite[pid]["natif"] = v  # production au pas du compteur (quart d'heure…) : coupures de l'onduleur
-    return pts, series, qualite, fin, journalieres
+# ---------------------------------------------------------------- chargement (voir vigie/series.py)
+from .series import PAS_HORAIRE, PAS_JOURNALIER, charger_series, lire_brut, points_releves, une_fois  # noqa: E402,F401
 
 
 def jour(s):
@@ -167,7 +84,7 @@ NUIT_HEURES_MIN = 0.75  # part minimale d'heures de nuit mesurées pour juger un
 
 def det_eau_nuit(s_m3h, P, seuil_l_h=20.0, persistance=3):
     h1, h2 = P["heures_nuit"]
-    l_h = s_m3h * 1000
+    l_h = (s_m3h * 1000).set_axis(calendrier.locale(s_m3h.index))  # heure de Zurich : la nuit des occupants
     nuit = l_h[(l_h.index.hour > h1) & (l_h.index.hour <= h2)]
     g = nuit.groupby(nuit.index.date)
     # Une nuit n'est jugée que si au moins 3 heures sur 4 sont mesurées : le minimum d'une nuit lacunaire
@@ -182,8 +99,8 @@ def det_eau_nuit(s_m3h, P, seuil_l_h=20.0, persistance=3):
             "mesure": f"{mins.iloc[-n:].median():.0f} l/h", "attendu": f"{ref:.0f} l/h",
             "m3_j": exces_l_h * 24 / 1000, "force": min(1.0, exces_l_h / 100),
             # constaté : la fuite coule en continu ; excès de débit constaté la nuit × heures mesurées depuis le début
-            "m3_mesure": exces_l_h * heures_depuis(s_m3h, mins.index[-n]) / 1000,
-            "heures_mesurees": heures_depuis(s_m3h, mins.index[-n])}
+            "m3_mesure": exces_l_h * heures_depuis(l_h, mins.index[-n]) / 1000,
+            "heures_mesurees": heures_depuis(l_h, mins.index[-n])}
 
 
 def det_eau_vide(s_m3h, P, seuil_l_j=50.0, persistance=2, fin=None, journalier=False):
@@ -223,7 +140,7 @@ SAISON_MARGE_J = 45
 RECENT_J = 60
 SIGNATURE_JOURS_MIN = 30  # jours jugés nécessaires pour apprendre une signature énergétique
 
-# Abaissement nocturne du chauffage (heures de fin d'intervalle, UTC) : la chaleur par degré est plus faible la nuit.
+# Abaissement nocturne du chauffage (fin d'intervalle, heure de Zurich) : la chaleur par degré est plus faible la nuit.
 # Une référence apprise en fin d'été (froid surtout la nuit) sous-estime alors le chauffage de plein hiver (froid
 # aussi le jour) : biais mesuré +4 à +10 % sur immeuble sain (campagne d'évaluation). Le modèle sépare donc la part
 # de nuit quand la référence contient assez d'heures froides de JOUR pour l'apprendre ; sinon, modèle simple.
@@ -232,7 +149,7 @@ HEURES_JOUR_FROIDES_MIN = 120  # heures de jour sous 14 °C dans la référence 
 
 
 def heures_nuit_chauffe(index):
-    return (index.hour >= NUIT_CHAUFFE[0]) | (index.hour < NUIT_CHAUFFE[1])
+    return ~calendrier.locale(index).hour.isin(range(NUIT_CHAUFFE[1], NUIT_CHAUFFE[0]))  # heure de Zurich
 
 
 def jour_froid_suffisant(text_h_ref):
@@ -420,7 +337,7 @@ def det_chaleur_vide(s_kwh, talon, fin, P=None, facteur=1.5, persistance=2, jour
 
 def det_elec_nuit(s_kwh, fin, P, seuil=1.20, persistance=3, ref_avant=None, text_h=None):
     h1, h2 = P["heures_nuit"]
-    kw = s_kwh  # kWh par heure = kW moyen
+    kw = s_kwh.set_axis(calendrier.locale(s_kwh.index))  # kWh par heure = kW moyen ; nuits à l'heure de Zurich
     detect = kw[(kw.index.hour > h1) & (kw.index.hour <= h2)]
     nuits = detect.groupby(detect.index.date).mean().dropna()
     large = kw[(kw.index.hour > 22) | (kw.index.hour <= 6)]
@@ -637,7 +554,7 @@ def analyser(cx, ref, jusqua=None, brut=None, gelees=None):
     pts, series, qualite, fin, journ = charger_series(cx, jusqua, brut)
     # Rejeu : un compteur dont le premier relevé est postérieur à la date rejouée n'était pas encore relevé ce
     # jour-là. Il n'est pas « muet » (aucune alerte Données), et aucune règle ne tourne sur lui faute de mesures.
-    pas_encore_releves = set(brut[1]["point_id"].unique()) - set(qualite) if jusqua is not None else set()
+    pas_encore_releves = points_releves(brut) - set(qualite) if jusqua is not None else set()
     if fin is None:
         return [], None
     gelees = references_gelees(cx) if gelees is None else gelees
@@ -645,9 +562,11 @@ def analyser(cx, ref, jusqua=None, brut=None, gelees=None):
     meteo_id = (ref.get("meteo") or {}).get("id")
     text_h = series.get(meteo_id)
     ray_h = series.get((ref.get("rayonnement") or {}).get("id"))  # rayonnement global (W/m²) : solaire
-    mensuelles = historique.series_mensuelles(*brut, jusqua)  # gaz et PAC par mois civil (historique du même mois)
+    # gaz, PAC… par mois civil (historique du même mois)
+    mensuelles = historique.series_mensuelles(*brut, jusqua, une_fois(brut, "mensuelles", historique.preparer_mensuelles))
     dj_mois = historique.contexte(cx, text_h, ray_h)  # degrés-jours, rayonnement et changements d'installation
-    alertes, points_en_defaut = [], set()
+    decl = declarations.preparer(cx, ref, fin, brut, qualite, series, journ, mensuelles)  # périodes, changements, sourdines
+    alertes, points_en_defaut, juges = [], set(), set()  # juges : (immeuble, cause) des règles qui ont tourné
 
     # 1. Qualité des données d'abord : un point défaillant ne produit pas d'alerte énergie
     for im in ref["immeubles"]:
@@ -675,7 +594,7 @@ def analyser(cx, ref, jusqua=None, brut=None, gelees=None):
         ok = lambda f: valide(f) and ids[f] in series  # noqa: E731
         jour_ok = lambda f: ok(f) or (valide(f) and ids[f] in journ)  # noqa: E731
         serie_j = lambda f: (series[ids[f]], False) if ok(f) else (journ[ids[f]], True)  # noqa: E731
-        actif = lambda c: R[c]["active"] and im["profil"] in R[c]["profils"]  # noqa: E731
+        actif = lambda c: R[c]["active"] and decl.profil(im) in R[c]["profils"]  # noqa: E731
         gel = lambda c: gelees.get(f"{im['id']}-{c}")  # noqa: E731  début d'une dérive déjà en alerte (référence gelée)
         cand = []
         if ok("eau") and actif("eau_nuit"):
@@ -744,9 +663,10 @@ def analyser(cx, ref, jusqua=None, brut=None, gelees=None):
                 cand.append((cause, *historique.candidat(im, fl, mensuelles, points_en_defaut, dj_mois, fin, P,
                                                          R[cause], gel(cause))))
         trouvees = {cause for cause, _pid, res in cand if res}
+        juges.update((im["id"], cause) for cause, pid, _res in cand if pid)
         for cause, pid, res in cand:
             if res and not historique.doublon(cause, trouvees):
-                a = _alerte_metier(im, pid, cause, res, qualite[pid], R[cause], tarifs, co2, P)
+                a = decl.sourdine(_alerte_metier(im, pid, cause, res, qualite[pid], R[cause], tarifs, co2, P))
                 if gel(cause) is not None:  # gel appliqué : gardé tel quel par les analyses suivantes
                     a["reference_gelee"] = str(pd.Timestamp(gel(cause)).date())
                 alertes.append(a)
@@ -755,6 +675,7 @@ def analyser(cx, ref, jusqua=None, brut=None, gelees=None):
     seuil = seuil_enjeu_mois(P)
     alertes = [a for a in alertes if a["gravite"] == "Données" or a["sinistre"] or a["chf_mois"] >= seuil
                or TEXTES.get(a["cause"], {}).get("non_chiffre")]  # dérive sans kWh (retour du CAD) : jamais masquée
+    recoupement.marquer(alertes, juges, P)  # cause commune à plusieurs immeubles : confiance abaissée avant le score
     for a in alertes:
         a["score"] = _score(a, URGENCE)
     alertes.sort(key=lambda a: (a["gravite"] == "Données", -a["score"]))

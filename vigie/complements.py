@@ -16,6 +16,8 @@ Tous les chiffres sont calculés ici (règle 5). Comme les autres règles : réf
 import numpy as np
 import pandas as pd
 
+from . import calendrier
+
 EAU_FENETRE_J = 7            # minimum glissant sur 7 jours : contient toujours un week-end
 EAU_SEUIL_L_J = 480.0        # hausse minimale du niveau de base : 20 l/h en continu, comme la règle eau_nuit
 EAU_REF_JOURS_MIN = 30
@@ -244,12 +246,14 @@ NUIT_DJ_ETENDUE_MIN = 4.0  # et au moins 4 degrés d'écart entre la nuit la plu
 def elec_nuit_meteo(nuits, heures_larges, text_h, fin, P, seuil, persistance, ref_avant):
     """(site sensible au froid ?, résultat). Site non sensible : (False, None), la règle habituelle s'applique.
 
-    `nuits` : puissance moyenne de chaque nuit (1 h – 5 h) ; `heures_larges` : heures de 22 h à 6 h (chiffrage)."""
+    `nuits` : puissance moyenne de chaque nuit (1 h – 5 h) ; `heures_larges` : heures de 22 h à 6 h (chiffrage) ;
+    l'une et l'autre à l'heure de Zurich (calendrier.locale), comme le froid de la nuit calculé ici."""
     from .chiffrage import heures_depuis
     from .moteur import (COTES_MIN, DJ_COMPARABLE, JOURS_COMPARABLES_MIN, JUGE_RECENT_MAX_J, _attendu_comparable,
                          limite_reference, serie_consecutive_fin)
     h1, h2 = P["heures_nuit"]
-    froid = text_h[(text_h.index.hour > h1) & (text_h.index.hour <= h2)]
+    froid = text_h.set_axis(calendrier.locale(text_h.index))
+    froid = froid[(froid.index.hour > h1) & (froid.index.hour <= h2)]
     dj = (16.0 - froid.groupby(froid.index.date).mean()).clip(lower=0)
     d = pd.DataFrame({"p": nuits, "dj": dj}).dropna()
     d.index = pd.to_datetime(d.index)

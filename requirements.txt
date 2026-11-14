@@ -1,2 +1,7 @@
-pandas>=2.0
-numpy>=1.24
+# Dépendances de l'application (dossier vigie/) et des tests.
+# Bornes = versions sur lesquelles la suite de tests a réellement tourné, sous Python 3.12 :
+#   borne basse : pandas 2.2.3 avec numpy 1.26.4 ; borne haute : pandas 3.1.1 avec numpy 2.5.4.
+# Les versions majeures suivantes (pandas 4, numpy 3) ne sont pas testées : pandas 3.1 annonce déjà le retrait
+# d'un appel utilisé par vigie/solaire.py (Timestamp.dayofyear, avertissement Pandas4Warning).
+pandas>=2.2,<4
+numpy>=1.26,<3

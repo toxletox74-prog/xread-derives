@@ -13,7 +13,11 @@
     "gaz_pcs_kwh_par_m3": 10.5,
     "dj16_annuel_normal": 2122.0,
     "dj16_nuit_annuel_normal": 761.3,
-    "rayonnement_annuel_normal_kwh_m2": 1385.9
+    "rayonnement_annuel_normal_kwh_m2": 1385.9,
+    "cause_commune_immeubles_min": 4,
+    "cause_commune_part_min": 0.1,
+    "cause_commune_fenetre_jours": 3,
+    "cause_commune_confiance": 0.5
   },
   "tarifs": {
     "electricite": {

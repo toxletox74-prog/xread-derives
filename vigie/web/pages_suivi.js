@@ -4,6 +4,7 @@ import {
   PROFILS, RETOURS, STATUTS_BON,
 } from './outils.js';
 import { carteParc } from './carte.js';
+import { MOT_DE_PASSE_MANQUANT } from './pages_reglages.js';
 import { icone, pastilleFluide, tagFluide, cleFluide, libelleFluide, titreIcone, etatVide } from './icones.js';
 
 const GRAVITES = ['Critique', 'Élevée', 'Modérée', 'Données'];
@@ -33,6 +34,10 @@ export async function pageTableau(main, ctx) {
           + 'les règles « chauffage trop fort pour la météo » et « rendement PAC » ne sont pas fiables.'
         : 'Aucune température extérieure : les règles « chauffage trop fort pour la météo » et « rendement PAC » ne tournent pas.'),
       h('a', { class: 'bouton', href: '#/reglages' }, 'Voir la source météo')));
+  }
+  if (e.smtp_mot_de_passe_manquant) {
+    bannieres.push(h('div', { class: 'banniere attention' }, h('span', {}, MOT_DE_PASSE_MANQUANT),
+      h('a', { class: 'bouton', href: '#/reglages' }, 'Saisir le mot de passe')));
   }
   const c = e.couverture || {};
   if (c.sans_effet || c.compteurs_sans_regle) {
@@ -181,7 +186,7 @@ function carteAlerte(a, rang, ctx) {
   if (a.bon) {
     actionBon = h('button', { type: 'button', onclick: () => ouvrirBon(a.bon.id, ctx) },
       icone('bon'), `Bon ${a.bon.numero} · ${STATUTS_BON[a.bon.statut]}`);
-  } else if (!resolue) {
+  } else if (!resolue && a.suivi !== 'sourdine') {
     actionBon = h('button', { type: 'button', class: 'primaire', onclick: () => tenter(async () => {
       const r = await api('POST', `/api/alertes/${encodeURIComponent(a.id)}/bon`, {});
       await ctx.rafraichirEtat();
@@ -194,7 +199,11 @@ function carteAlerte(a, rang, ctx) {
     h('div', { class: 'corps' },
       h('div', { class: 'tags' }, chip(a.gravite), tagFluide(a.fluide),
         a.persistance ? h('span', { class: 'doux petit' }, 'depuis ' + a.persistance) : null,
-        resolue ? h('span', { class: 'chip g-OK' }, 'Résolue le ' + fmt.date(a.cloturee_le)) : null),
+        a.cause_commune ? h('span', { class: 'chip g-Attente', title: 'Effet probable de météo ou de calendrier : à vérifier avant d\'agir. Aucun bon automatique.' },
+          `Cause commune probable · ${a.cause_commune.immeubles} immeubles les mêmes jours`) : null,
+        resolue ? h('span', { class: 'chip g-OK' }, 'Résolue le ' + fmt.date(a.cloturee_le)) : null,
+        a.suivi === 'sourdine' ? h('span', { class: 'chip g-Attente' },
+          `En sourdine jusqu'au ${fmt.date(a.sourdine.jusquau)} : ${a.sourdine.motif}`) : null),
       h('span', { class: 'titre' }, a.titre),
       h('a', { class: 'doux petit lien-immeuble', href: '#/immeuble/' + encodeURIComponent(a.immeuble_id) },
         icone('immeuble'), `${a.immeuble} · ${a.adresse}`),
@@ -231,7 +240,7 @@ export async function pageAlertes(main, ctx) {
           + 'sa consigne et le prestataire à mandater.')),
       h('div', { class: 'actions' }, boutonAnalyse(ctx))),
     h('div', { class: 'filtres' },
-      champ('Afficher', liste('statut', [['ouverte', 'Alertes ouvertes'], ['resolue', 'Alertes résolues'], ['toutes', 'Toutes']], statut)),
+      champ('Afficher', liste('statut', [['ouverte', 'Alertes ouvertes'], ['sourdine', 'En sourdine'], ['resolue', 'Alertes résolues'], ['toutes', 'Toutes']], statut)),
       champ('Gravité', liste('gravite', [['', 'Toutes'], 'Critique', 'Élevée', 'Modérée', 'Données'], '')),
       champ('Fluide', liste('fluide', [['', 'Tous les fluides'], ...fluides], '')),
       champ('Rechercher', h('input', { type: 'search', name: 'q', placeholder: 'Immeuble, adresse…' }))),

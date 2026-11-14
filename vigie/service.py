@@ -157,7 +157,7 @@ def analyser(cx, mot_de_passe=None, automatiser=True, envoi=None):
     if fin is None:
         return {"alertes": [], "donnees_au": None, "nouvelles": [], "bons": None}
     os.makedirs(SORTIE, exist_ok=True)
-    rapport.ecrire(alertes, fin, SORTIE)
+    rapport.ecrire([a for a in alertes if not a.get("sourdine")], fin, SORTIE)  # sourdines : hors des alertes à traiter
     nouvelles = bons.synchroniser_alertes(cx, alertes)
     auto = bons.automatiser(cx, nouvelles, mot_de_passe, envoi) if automatiser else None
     db.ecrire_parametre(cx, "derniere_analyse", {"le": bons.maintenant(), "donnees_au": str(fin), "alertes": len(alertes)})

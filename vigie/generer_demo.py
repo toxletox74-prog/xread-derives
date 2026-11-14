@@ -1,6 +1,8 @@
 """Génère un jeu de données d'exemple (12 mois) au format d'import Vigie.
 
 Format CSV : ts (UTC, ISO, fin d'intervalle), point_id, valeur
+Les profils des occupants (présence, eau, nuit de 1 h à 5 h) et l'abaissement nocturne du chauffage (22 h – 5 h) sont
+simulés à l'HEURE DE ZURICH, comme le moteur les lit ; la température et le soleil suivent l'heure UTC (physique).
 Toutes les séries sont relevées au PAS HORAIRE (les données réelles arrivent au mieux à l'heure) : l'eau et
 l'électricité sont simulées par quart d'heure (chasses d'eau, présence) puis relevées à l'heure pleine (index lu à
 l'heure, électricité cumulée sur l'heure) ; mêmes tirages aléatoires et mêmes dérives qu'au pas de 15 min.
@@ -23,14 +25,23 @@ Grand exemple (config/exemple_grand.json) : immeubles PAC (G01-G16) et immeubles
 et solaire : G06 panne (−25 %), G03 encrassement progressif, G14 onduleur à l'arrêt.
 """
 import csv
+import functools
 import math
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 FIN = datetime(2026, 11, 11, 6, 0)   # fin de la série fictive (UTC)
 JOURS = 365                          # 12 mois d'historique : la référence « même saison l'an passé » joue
 PCS_GAZ = 10.5                       # kWh par m³ (valeur d'EXEMPLE du référentiel, gaz_pcs_kwh_par_m3)
 RENDEMENT_CHAUDIERE = 0.92           # gaz consommé = chaleur ÷ rendement (simulation)
+FUSEAU = ZoneInfo("Europe/Zurich")
+
+
+@functools.lru_cache(maxsize=None)
+def locale(t):
+    """Instant UTC naïf -> heure de Zurich (naïve) : celle que vivent les occupants et que suit la régulation."""
+    return t.replace(tzinfo=timezone.utc).astimezone(FUSEAU).replace(tzinfo=None)
 
 
 def temperature_fictive(t, debut):
@@ -129,13 +140,13 @@ def _elec_eau(spec, ajoute, quarts, jours_avant_fin, rnd):
     occ = spec.get("taux_occupation") or 1.0
     travaux = spec["profil"] == "Travaux"
     derive = spec.get("simulation", {}).get("derive")
-    nuit = lambda t: t.hour >= 22 or t.hour < 6  # noqa: E731
+    nuit = lambda t: locale(t).hour >= 22 or locale(t).hour < 6  # noqa: E731
 
     # Électricité générale (simulée par 15 min, relevée à l'heure) ; G08 : +30 % la nuit depuis 14 nuits
     base_kw, jour_kw = 0.10 * logements * occ, 0.30 * logements * occ * (0.4 if travaux else 1.0)
     heure = _releve_horaire(ajoute, f"{gid}_ELEC")
     for t in quarts:
-        hh = t.hour + t.minute / 60
+        hh = locale(t).hour + t.minute / 60
         presence = max(0.0, math.sin((hh - 6) / 17 * math.pi)) if 6 <= hh <= 23 else 0.0
         if travaux:  # chantier : journée ouvrée seulement
             presence = 1.0 if 7 <= hh < 17 else 0.0
@@ -147,7 +158,7 @@ def _elec_eau(spec, ajoute, quarts, jours_avant_fin, rnd):
     # Eau froide (index lu à l'heure pleine, écoulement simulé par 15 min) ; G05 : fuite continue +60 l/h depuis 5 nuits
     index = 2000.0 + rnd.uniform(0, 800)
     for t in quarts:
-        hh = t.hour + t.minute / 60
+        hh = locale(t).hour + t.minute / 60
         profil = 0.02 + 1.2 * math.exp(-((hh - 7.5) ** 2) / 2) + 1.0 * math.exp(-((hh - 19.5) ** 2) / 3) + 0.4
         if 1 <= hh < 5:
             profil = 0.0
@@ -173,7 +184,7 @@ def _immeuble_chaudiere(spec, ajoute, heures, quarts, temp, jours_avant_fin, gra
     k, ecs = logements * 0.22, logements * 0.12
     index = 5000.0 + rnd.uniform(0, 2000)
     for t in heures:
-        reduit = 0.8 if (t.hour >= 22 or t.hour < 5) else 1.0
+        reduit = 0.8 if (locale(t).hour >= 22 or locale(t).hour < 5) else 1.0
         f = rnd.uniform(0.95, 1.05) * (1.18 if sim.get("derive") == "signature" and jours_avant_fin(t) <= 12 else 1.0)
         q = (k * max(0.0, 16 - temp[t]) * reduit + ecs) * f
         if sim["chauffage"] == "cad":
@@ -201,7 +212,7 @@ def _immeuble_pac(spec, ajoute, heures, quarts, temp, jours_avant_fin, graine):
     points_chaleur = {"totale": f"{gid}_PAC_CHAL", "chauffage": f"{gid}_PAC_CHAUF", "ecs": f"{gid}_PAC_ECS"}
     for t in heures:
         text = temp[t]
-        reduit = 0.8 if (t.hour >= 22 or t.hour < 5) else 1.0
+        reduit = 0.8 if (locale(t).hour >= 22 or locale(t).hour < 5) else 1.0
         f = rnd.uniform(0.95, 1.05)
         q_ch, q_ecs = k * max(0.0, 16 - text) * reduit * f, ecs * f
         valeurs = {"totale": q_ch + q_ecs, "chauffage": q_ch, "ecs": q_ecs}
@@ -294,7 +305,7 @@ def _generer(graine, temperatures, point_meteo, sans, pac_mesure, supplementaire
         k = logements * 0.22
         for t in heures:
             text = temp[t]
-            reduit = 0.8 if (t.hour >= 22 or t.hour < 5) else 1.0
+            reduit = 0.8 if (locale(t).hour >= 22 or locale(t).hour < 5) else 1.0
             ecs = logements * 0.12
             f = facteur(t) * rnd.uniform(0.95, 1.05)
             q_chauffage, q_ecs = k * max(0.0, 16 - text) * reduit * f, ecs * f
@@ -335,14 +346,14 @@ def _generer(graine, temperatures, point_meteo, sans, pac_mesure, supplementaire
     def elec(pid, base_kw, jour_kw, extra=lambda t: 0.0, facteur=1.0):
         heure = _releve_horaire(ajoute, pid)
         for t in quarts:
-            h = t.hour + t.minute / 60
+            h = locale(t).hour + t.minute / 60
             occ = max(0.0, math.sin((h - 6) / 17 * math.pi)) if 6 <= h <= 23 else 0.0
             p = (base_kw + jour_kw * occ) * facteur + extra(t)
             heure(t, p * 0.25 * rnd.uniform(0.93, 1.07))
 
     elec("T8_ELEC", 3.0, 9.0)
     elec("R41_ELEC", 1.2, 0.0)
-    nuit_oa = lambda t: 1.1 if (jours_avant_fin(t) <= 14 and (t.hour >= 22 or t.hour < 6)) else 0.0
+    nuit_oa = lambda t: 1.1 if (jours_avant_fin(t) <= 14 and not 6 <= locale(t).hour < 22) else 0.0
     elec("OA_ELEC", 3.5, 12.0, nuit_oa)
     elec("OB_ELEC", 3.2, 10.0)
     elec("VG_ELEC", 2.5, 8.0, facteur=0.6)
@@ -351,7 +362,7 @@ def _generer(graine, temperatures, point_meteo, sans, pac_mesure, supplementaire
     def eau(pid, logements, fuite=lambda t: 0.0, facteur=1.0):
         index = 1000.0 + rnd.uniform(0, 500)
         for t in quarts:
-            h = t.hour + t.minute / 60
+            h = locale(t).hour + t.minute / 60
             profil = 0.02 + 1.2 * math.exp(-((h - 7.5) ** 2) / 2) + 1.0 * math.exp(-((h - 19.5) ** 2) / 3) + 0.4
             if 1 <= h < 5:
                 profil = 0.0

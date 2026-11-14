@@ -274,6 +274,24 @@ const MODES = [
     + 'Je suis en copie si je l\'indique.'],
 ];
 
+// Le mot de passe SMTP n'est gardé qu'en mémoire : après un redémarrage, l'envoi automatique échoue tant qu'il manque
+export const MOT_DE_PASSE_MANQUANT = 'Envoi automatique des bons impossible : le mot de passe de la messagerie n\'est pas '
+  + 'en mémoire (il est perdu à chaque redémarrage de Vigie). Saisissez-le dans Réglages › Messagerie, ou définissez la variable d\'environnement '
+  + 'VIGIE_SMTP_MOT_DE_PASSE. En attendant, les bons restent en brouillon.';
+
+// Dernière analyse automatique : date, déclencheur, résultat ou erreur
+function etatAnalyseAuto(a, e) {
+  const [classe, lib] = !e ? ['g-Données', 'Jamais lancée']
+    : { ok: ['g-OK', 'Réussie'], attention: ['g-Attente', 'À vérifier'], erreur: ['g-Critique', 'Échec'] }[e.statut] || ['g-Données', e.statut];
+  const tuile = (titre, valeur) => h('div', {}, h('div', { class: 'doux petit' }, titre), h('b', {}, valeur));
+  return h('div', { class: 'pile' },
+    h('div', { class: 'resume-import' },
+      tuile('Dernière analyse automatique', e ? `${fmt.dateHeure(e.le)} (${e.declencheur})` : '—'),
+      tuile('Résultat', h('span', { class: 'chip ' + classe }, lib)),
+      tuile('Fréquence', a.analyse_auto ? `Toutes les ${a.analyse_intervalle_h} h et après un relevé API` : 'Manuelle')),
+    e && e.message ? h('p', { class: e.statut === 'ok' ? 'doux petit' : 'gras' }, e.message) : null);
+}
+
 function carteMeteo(m, ctx) {
   const exemple = m.source === 'exemple';
   const fictif = !!m.exemple_fictif; // exemple sur températures fictives : aucune mise à jour possible
@@ -347,7 +365,14 @@ export async function pageReglages(main, ctx) {
       champ('À partir de la gravité', liste('gravite_min', r.gravites, a.gravite_min), 'Les alertes moins graves restent à traiter à la main.'),
       h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Problèmes de données'),
         h('label', { class: 'coche' }, h('input', { type: 'checkbox', name: 'inclure_donnees', checked: a.inclure_donnees }),
-          'Préparer aussi un bon au prestataire de télérelève'))));
+          'Préparer aussi un bon au prestataire de télérelève')),
+      h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Analyse automatique'),
+        h('label', { class: 'coche' }, h('input', { type: 'checkbox', name: 'analyse_auto', checked: a.analyse_auto }),
+          'Lancer l\'analyse sans intervention (tant que Vigie tourne)')),
+      champ('Fréquence de l\'analyse automatique (heures)', h('input', { type: 'number', name: 'analyse_intervalle_h',
+        value: a.analyse_intervalle_h, min: 1, max: 168 }),
+      'Aussi lancée après chaque relevé API automatique qui apporte de nouvelles mesures.')),
+    etatAnalyseAuto(a, r.analyse_auto));
   const mess = h('div', { class: 'formulaire' },
     champ('Nom de l\'expéditeur', saisie('expediteur_nom', m.expediteur_nom, { placeholder: 'Régie — Gestion technique' })),
     champ('E-mail de l\'expéditeur', h('input', { type: 'email', name: 'expediteur_email', value: m.expediteur_email })),
@@ -367,12 +392,14 @@ export async function pageReglages(main, ctx) {
   const enregistrerAuto = () => tenter(async () => {
     const d = { mode: auto.querySelector('input[name=mode]:checked').value,
       gravite_min: auto.querySelector('select[name=gravite_min]').value,
-      inclure_donnees: auto.querySelector('input[name=inclure_donnees]').checked };
+      inclure_donnees: auto.querySelector('input[name=inclure_donnees]').checked,
+      analyse_auto: auto.querySelector('input[name=analyse_auto]').checked,
+      analyse_intervalle_h: auto.querySelector('input[name=analyse_intervalle_h]').value };
     if (d.mode === 'envoi' && !ctx.etat.smtp_configure) {
       throw new Error('L\'envoi automatique demande une messagerie configurée (serveur d\'envoi et e-mail de l\'expéditeur).');
     }
     await api('PUT', '/api/reglages', { automatisation: d });
-    await ctx.rafraichirEtat();
+    await ctx.recharger(); // réaffiche l'avertissement « mot de passe manquant » et la fréquence enregistrée
   }, 'Automatisation enregistrée.');
   const enregistrerMessagerie = () => tenter(async () => {
     const d = lireFormulaire(mess);
@@ -391,7 +418,9 @@ export async function pageReglages(main, ctx) {
     h('section', { class: 'carte' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('bon', 'h2', {}, 'Automatisation des bons de travaux'),
         h('span', { class: 'doux petit' }, 'Un seul bon ouvert par alerte : une dérive qui dure ne crée pas un nouveau bon à chaque analyse.'))),
-      h('div', { class: 'carte-corps' }, auto,
+      h('div', { class: 'carte-corps' },
+        r.mot_de_passe_manquant ? h('div', { class: 'banniere attention' }, h('span', {}, MOT_DE_PASSE_MANQUANT)) : null,
+        auto,
         h('div', { class: 'actions' }, h('button', { type: 'button', class: 'primaire', onclick: enregistrerAuto }, 'Enregistrer')))),
     h('section', { class: 'carte' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('courriel', 'h2', {}, 'Messagerie'),

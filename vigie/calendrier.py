@@ -18,6 +18,16 @@ OUVRE, VACANCES, NON_OUVRE = "O", "V", "N"   # ouvré hors vacances, ouvré pend
 SERIES = ("jour_ouvre", "jour_vacances_scolaires")
 ECART_MIN = 0.10      # écart de consommation entre jours ouvrés et non ouvrés qui rend l'immeuble « sensible »
 JOURS_MIN = 10        # jours de chaque type exigés dans la référence pour en juger
+FUSEAU = "Europe/Zurich"  # la nuit des occupants et de la régulation se lit à l'heure locale, pas en UTC
+
+
+def locale(index):
+    """Index UTC naïf (convention de stockage, fin d'intervalle) -> même index à l'heure de Zurich, naïf.
+
+    Sert à lire l'heure du jour et la date d'une nuit (fenêtres de nuit, abaissement nocturne) ; les mesures et les
+    agrégations journalières restent en UTC. Changements d'heure : l'heure 2 h manque le dernier dimanche de mars
+    (nuit de 23 h) et revient deux fois le dernier dimanche d'octobre (nuit de 25 h)."""
+    return pd.DatetimeIndex(index).tz_localize("UTC").tz_convert(FUSEAU).tz_localize(None)
 
 
 def lire(cx):

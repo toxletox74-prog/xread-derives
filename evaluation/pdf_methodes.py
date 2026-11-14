@@ -51,7 +51,7 @@ def methodes(c):
     out.append(c.h3("Fuite de nuit — eau_nuit"))
     out += _fiche(c, "eau_nuit", [
         "débit_h      = Δindex(h) × 1000   (relevés horaires successifs)   [l/h]",
-        "min_nuit(n)  = min { débit_h : h ∈ ]1 h ; 5 h] UTC de la nuit n }   (4 relevés)",
+        "min_nuit(n)  = min { débit_h : h ∈ ]1 h ; 5 h] (heure de Zurich) de la nuit n }   (4 relevés)",
         "nuit jugée   si au moins 3 heures sur 4 mesurées",
         "alerte       si min_nuit > seuil pendant P nuits jugées consécutives",
         "référence    = médiane des min_nuit des 30 nuits avant la série en alerte",
@@ -108,7 +108,7 @@ def methodes(c):
     out += c.h2("5.3", "Électricité")
     out.append(c.h3("Consommation de nuit en hausse — elec_nuit"))
     out += _fiche(c, "elec_nuit", [
-        "P_nuit(n)    = puissance moyenne des relevés horaires de 1 h à 5 h UTC (kWh/h = kW)",
+        "P_nuit(n)    = puissance moyenne des relevés horaires de 1 h à 5 h, heure de Zurich (kWh/h = kW)",
         "référence    = médiane des P_nuit des nuits J-50 à J-20",
         "             (alerte ouverte → 30 nuits avant le début de la dérive)",
         "alerte       si P_nuit / référence > 1 + seuil pendant P nuits consécutives",

@@ -51,6 +51,10 @@ CREATE TABLE IF NOT EXISTS evenement (
   id INTEGER PRIMARY KEY AUTOINCREMENT, le TEXT NOT NULL, immeuble_id TEXT NOT NULL, alerte_id TEXT, bon_id INTEGER,
   type TEXT NOT NULL, texte TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS evenement_immeuble ON evenement (immeuble_id, le);
+CREATE TABLE IF NOT EXISTS declaration (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, immeuble_id TEXT NOT NULL, type TEXT NOT NULL, cause TEXT, point_id TEXT,
+  debut TEXT NOT NULL, fin TEXT, motif TEXT NOT NULL, auteur TEXT, cree_le TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS declaration_immeuble ON declaration (immeuble_id);
 CREATE TABLE IF NOT EXISTS bon (
   id INTEGER PRIMARY KEY AUTOINCREMENT, numero TEXT UNIQUE NOT NULL, alerte_id TEXT NOT NULL,
   immeuble_id TEXT NOT NULL, prestataire_id INTEGER REFERENCES prestataire(id), statut TEXT NOT NULL,

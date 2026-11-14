@@ -325,6 +325,7 @@ def supprimer_immeuble(cx, iid):
     cx.execute("DELETE FROM batiment WHERE immeuble_id = ?", (iid,))
     cx.execute("DELETE FROM installation WHERE immeuble_id = ?", (iid,))
     cx.execute("DELETE FROM alerte WHERE immeuble_id = ?", (iid,))
+    cx.execute("DELETE FROM declaration WHERE immeuble_id = ?", (iid,))
     n = cx.execute("DELETE FROM immeuble WHERE id = ?", (iid,)).rowcount
     _nettoyer_adresses(cx)
     cx.commit()

@@ -1,0 +1,9 @@
+# Dépendances supplémentaires des scripts de evaluation/ (figures et documents PDF de docs/).
+# Elles ne servent ni à l'application ni aux tests, et ne sont pas installées en production.
+#   matplotlib : evaluation/figures.py
+#   reportlab  : evaluation/pdf*.py
+# Bornes basses = seules versions essayées (import de tous les modules de evaluation/ sous Python 3.12, sans
+# exécuter les scripts). Pas de borne haute : aucune autre version n'a été essayée.
+-r requirements.txt
+matplotlib>=3.11
+reportlab>=5.1

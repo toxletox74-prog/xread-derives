@@ -254,8 +254,8 @@ def limites(c):
               ["Historique de moins d'un an", "Repli sur la période antérieure ; pas de conclusion sous 30 jours de "
                "référence (signature), 20 jours ou 240 heures froides (PAC)", "Conserver 12 mois de mesures et de "
                "météo (400 jours prévus pour la météo)."],
-              ["Nuit et abaissement en heures UTC", "Fenêtres décalées d'une heure entre l'hiver et l'été (heure de "
-               "Genève)", "Fenêtres en heure locale (Europe/Zurich) et horaire d'abaissement réglable par immeuble."],
+              ["Abaissement nocturne supposé de 22 h à 5 h", "Même horaire (heure de Zurich) pour tous les immeubles",
+               "Horaire d'abaissement réglable par immeuble."],
               ["Fuite sous 20 l/h", "Jamais détectée par la règle de nuit (seuil absolu)", "Ajouter un critère relatif "
                "au minimum de nuit habituel de l'immeuble."],
               ["Confiance non calibrée", "Indice d'ordre, pas une probabilité", "Recalibrer par immeuble avec les "
@@ -297,7 +297,7 @@ def annexes(c):
                      "Règles par défaut (vigie/moteur.py, REGLES) — réglables par le gestionnaire dans les bornes",
                      police=7.2)
     lignes = [["Paramètre", "Valeur", "Rôle"],
-              ["heures_nuit", f"{P['heures_nuit'][0]} h - {P['heures_nuit'][1]} h UTC", "fenêtre de nuit (eau, électricité)"],
+              ["heures_nuit", f"{P['heures_nuit'][0]} h - {P['heures_nuit'][1]} h (Zurich)", "fenêtre de nuit (eau, électricité)"],
               ["persistance_min_jours", nb(P["persistance_min_jours"]), "référence du calcul de confiance"],
               ["enjeu_min_chf_mois", f"{nb(P['enjeu_min_chf_mois'], 2)} CHF par mois", "alerte masquée en dessous (sauf "
                "sinistre, données) ; = 100 CHF/an × 30/365"],
@@ -316,7 +316,7 @@ def annexes(c):
               ["SIGNATURE_JOURS_MIN", f"{moteur.SIGNATURE_JOURS_MIN} j", "jours jugés pour apprendre la signature"],
               ["JOUR_HEURES_MIN", f"{moteur.JOUR_HEURES_MIN} h", "heures mesurées pour juger un jour"],
               ["NUIT_HEURES_MIN", pct(moteur.NUIT_HEURES_MIN), "heures de nuit mesurées pour juger une nuit"],
-              ["NUIT_CHAUFFE", f"{moteur.NUIT_CHAUFFE[0]} h - {moteur.NUIT_CHAUFFE[1]} h UTC", "abaissement nocturne supposé"],
+              ["NUIT_CHAUFFE", f"{moteur.NUIT_CHAUFFE[0]} h - {moteur.NUIT_CHAUFFE[1]} h (Zurich)", "abaissement nocturne supposé"],
               ["HEURES_JOUR_FROIDES_MIN", nb(moteur.HEURES_JOUR_FROIDES_MIN),
                "heures de jour sous 14 °C pour apprendre la part de nuit"],
               ["PAC_HEURES_REF_MIN", nb(moteur.PAC_HEURES_REF_MIN), "heures de référence minimales (PAC)"],

@@ -118,15 +118,22 @@ CREATE TABLE appareil (
     index_depose  NUMERIC
 );
 
--- Périodes déclarées : travaux, vacance, maintenance (suspendent certaines règles)
-CREATE TABLE periode_declaree (
+-- Déclarations du gestionnaire (vigie/declarations.py) : sourdine justifiée d'une règle, travaux ou vacance datés
+-- (règles d'énergie suspendues, jours exclus de la référence), changement (compteur remplacé, consigne ou courbe de
+-- chauffe modifiée : la référence ne remonte pas avant). Chaque déclaration est tracée dans l'historique (evenement).
+CREATE TABLE declaration (
     id          BIGSERIAL PRIMARY KEY,
     immeuble_id TEXT NOT NULL REFERENCES immeuble(id),
-    type        TEXT NOT NULL,              -- Travaux, Vide, Maintenance
-    debut       TIMESTAMPTZ NOT NULL,
-    fin         TIMESTAMPTZ,
-    commentaire TEXT
+    type        TEXT NOT NULL CHECK (type IN ('sourdine','travaux','vacance','changement')),
+    cause       TEXT,                       -- sourdine : règle concernée
+    point_id    TEXT,                       -- changement : compteur concerné (NULL = tous ceux de l'immeuble)
+    debut       DATE NOT NULL,              -- date d'effet (changement : date du changement)
+    fin         DATE,                       -- obligatoire pour sourdine, travaux et vacance
+    motif       TEXT NOT NULL,
+    auteur      TEXT,
+    cree_le     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX declaration_immeuble ON declaration (immeuble_id);
 
 -- ---------- Mesures ----------
 CREATE TABLE mesure (

@@ -163,11 +163,9 @@ REGLES = {
 # ---------------------------------------------------------------- séries par mois civil et références du mois
 
 
-def series_mensuelles(pts, raw, jusqua=None):
-    """{compteur: valeur par mois civil} des compteurs comparés à leur historique (valeurs valides).
-
-    Relevé mensuel : la valeur du mois. Courbe plus fine : somme des mois COMPLETS seulement (≥ 90 % des relevés).
-    `jusqua` (rejeu) : seuls les relevés reçus à cette date sont vus."""
+def preparer_mensuelles(pts, raw):
+    """{compteur: (horodatages, valeurs valides, mois civil couvert par chaque relevé, pas)} des compteurs comparés à
+    leur historique : ce qui ne dépend pas de la date vue, préparé une seule fois par rejeu."""
     if raw.empty:
         return {}
     concernes = pts[pts["fluide"].isin([*FLUIDES, CHALEUR_PAC]) & (pts["nature"] == "intervalle")]
@@ -180,16 +178,28 @@ def series_mensuelles(pts, raw, jusqua=None):
         garde = [au or (im, fl) not in deja for au, im, fl in zip(au_mois, concernes["immeuble_id"], concernes["fluide"])]
         ids = concernes.index[garde]
     r = raw[raw["point_id"].isin(ids) & (raw["qualite"] == "valide")]
-    if jusqua is not None:
-        r = r[r["ts"] <= jusqua]
+    # horodatage de fin d'intervalle -> mois couvert
+    return {pid: (g["ts"], g["valeur"], (g["ts"] - pd.Timedelta(seconds=1)).dt.to_period("M"), float(pts.loc[pid, "pas_min"]))
+            for pid, g in r.groupby("point_id")}
+
+
+def series_mensuelles(pts, raw, jusqua=None, prepare=None):
+    """{compteur: valeur par mois civil} des compteurs comparés à leur historique (valeurs valides).
+
+    Relevé mensuel : la valeur du mois. Courbe plus fine : somme des mois COMPLETS seulement (≥ 90 % des relevés).
+    `jusqua` (rejeu) : seuls les relevés reçus à cette date sont vus. `prepare` : preparer_mensuelles(pts, raw) déjà
+    calculé (rejeu)."""
     out = {}
-    for pid, g in r.groupby("point_id"):
-        pas = float(pts.loc[pid, "pas_min"])
-        mois = (g["ts"] - pd.Timedelta(seconds=1)).dt.to_period("M")  # horodatage de fin d'intervalle -> mois couvert
-        somme = g["valeur"].groupby(mois).sum()
+    for pid, (ts, valeur, mois, pas) in (preparer_mensuelles(pts, raw) if prepare is None else prepare).items():
+        if jusqua is not None:
+            vus = ts <= jusqua
+            if not vus.any():
+                continue
+            valeur, mois = valeur[vus], mois[vus]
+        somme = valeur.groupby(mois).sum()
         if pas < PAS_MENSUEL:
             attendus = pd.Series(somme.index.days_in_month * 1440 / pas, index=somme.index)
-            somme = somme[g["valeur"].groupby(mois).count() >= MOIS_COMPLET_MIN * attendus]
+            somme = somme[valeur.groupby(mois).count() >= MOIS_COMPLET_MIN * attendus]
         if len(somme):
             out[pid] = somme.sort_index()
     return out

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from commun import base_exemple, base_vide
 
-from vigie import bons, complements, db, meteo, moteur, rejeu, service
+from vigie import bons, complements, db, meteo, moteur, rejeu, series, service
 
 P = {"fenetre_analyse_jours": 30}
 FIN = pd.Timestamp("2025-09-01")
@@ -109,6 +109,37 @@ class TestRejeu(unittest.TestCase):
         avant, vu = moteur.analyser(self.cx, self.ref, jusqua=self.fin - pd.Timedelta(days=20), gelees={})
         self.assertEqual(vu, self.fin - pd.Timedelta(days=20))
         self.assertNotIn("T8-eau_nuit", {a["id"] for a in avant})      # la fuite commence 5 nuits avant la fin
+
+    def test_date_rejouee_equivaut_a_une_base_arretee_a_cette_date(self):
+        """Les séries sont préparées une fois puis tronquées : aucune mesure postérieure ne doit changer le résultat."""
+        brut, levees = moteur.lire_brut(self.cx), 0
+        for recul in (pd.Timedelta(days=3), pd.Timedelta(days=20, hours=5, minutes=30), pd.Timedelta(days=75)):
+            date = self.fin - recul
+            cx = base_exemple("rejeu-arretee")
+            cx.execute("DELETE FROM mesure WHERE ts > ?", (date.strftime("%Y-%m-%dT%H:%M:%SZ"),))
+            cx.commit()
+            vue = moteur.analyser(self.cx, self.ref, jusqua=date, brut=brut, gelees={})
+            self.assertEqual(vue, moteur.analyser(cx, self.ref, gelees={}), date)   # alertes complètes et fin des relevés
+            levees += len(vue[0])
+        self.assertGreater(levees, 0)                                   # la comparaison porte sur de vraies alertes
+
+    def test_heure_coupee_par_la_date_rejouee(self):
+        pts = pd.DataFrame({"nature": ["intervalle", "index"], "pas_min": 15.0, "fluide": ["electricite", "eau"]},
+                           index=["E", "W"])
+        ts = pd.date_range("2025-03-01 00:15", periods=4 * 24 * 3, freq="15min")
+        n = np.arange(len(ts))
+        raw = pd.concat([pd.DataFrame({"ts": ts, "point_id": "E", "valeur": n % 7 + 0.1, "qualite": "valide"}),
+                         pd.DataFrame({"ts": ts, "point_id": "W", "valeur": n * 1.5, "qualite": "valide"})],
+                        ignore_index=True)
+        raw = raw[raw["ts"] != pd.Timestamp("2025-03-02 08:30")]        # un relevé manquant : heure incomplète
+        brut = series.Brut(pts, raw)                                    # préparé une fois, comme dans un rejeu
+        for date in ("2025-03-02 00:00", "2025-03-02 10:20", "2025-03-02 08:45", "2025-03-03 23:59"):
+            date = pd.Timestamp(date)
+            _pts, vues, qualite, fin, _j = moteur.charger_series(None, date, brut)
+            _pts, seules, qualite_seule, fin_seule, _j = moteur.charger_series(None, None, (pts, raw[raw["ts"] <= date]))
+            self.assertEqual((fin, qualite, list(vues)), (fin_seule, qualite_seule, list(seules)), date)
+            for pid in vues:                                            # mêmes heures, même seau partiel en fin de série
+                pd.testing.assert_series_equal(vues[pid], seules[pid], check_exact=True, check_freq=True)
 
     def test_episodes_du_premier_au_dernier_jour_d_alerte(self):
         r = rejeu.rejouer(self.cx, self.ref, self.fin - pd.Timedelta(days=12), self.fin, pas_jours=3)

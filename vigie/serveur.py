@@ -3,6 +3,7 @@
 Écoute uniquement sur 127.0.0.1 : aucune donnée ne quitte le poste (règle 9). Protections :
   - en-tête Host vérifié (empêche le « DNS rebinding » depuis un site web malveillant) ;
   - toute requête qui modifie quelque chose doit porter l'en-tête X-Vigie (bloque les formulaires d'autres sites) ;
+  - lecture seule sans identification dès qu'un mot de passe est défini ou qu'un serveur frontal relaie (acces.py) ;
   - taille des envois limitée ; erreurs détaillées dans la console, message simple dans l'interface.
 """
 import contextlib
@@ -17,17 +18,20 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import bons, connecteur, courbes, db, excel, geo, meteo, moteur, parc, patrimoine, secret, service
+from . import acces, bons, connecteur, courbes, db, declarations, excel, geo, meteo, moteur, parc, patrimoine
+from . import planification, secret, service
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FICHIER_WEB_RE = re.compile(r"^/([a-z_]+\.(?:js|css|html))$")  # fichiers plats de vigie/web, sans sous-dossier
 TAILLE_MAX = 50 * 1024 * 1024
 ERREURS_METIER = (parc.ErreurSaisie, bons.ErreurBon, excel.ErreurExcel, meteo.ErreurMeteo, geo.ErreurGeo,
-                  connecteur.ErreurConnecteur, secret.ErreurSecret, patrimoine.ErreurPatrimoine)
+                  connecteur.ErreurConnecteur, secret.ErreurSecret, patrimoine.ErreurPatrimoine,
+                  declarations.ErreurDeclaration)
 ANOMALIES_MAX = 300  # anomalies d'import renvoyées à l'écran (toutes sont dans la base et le fichier CSV)
 # Appels réseau au fournisseur : connexion SQLite propre, sans le verrou commun (l'interface reste utilisable, et le
 # fournisseur de démonstration, servi par ce même serveur, peut répondre pendant l'appel).
-SANS_VERROU = {"tester_connecteur", "synchroniser_connecteur", "demo_fournisseur"}
+# Ouverture de session : hors verrou aussi (le délai après un mot de passe faux ne doit pas figer l'interface).
+SANS_VERROU = {"tester_connecteur", "synchroniser_connecteur", "demo_fournisseur", "ouvrir_session"}
 ORDRE_ETAT = {"Critique": 0, "Élevée": 1, "Modérée": 2, "Données": 3, "Attente": 4, "OK": 5}
 TUILES = "https://wmts.geo.admin.ch"  # fonds de carte swisstopo (seule ressource externe autorisée)
 
@@ -40,8 +44,8 @@ class Fichier:
 class Reponse:
     """Réponse JSON avec un code HTTP choisi (fournisseur de démonstration : 401, 404…)."""
 
-    def __init__(self, code, donnees):
-        self.code, self.donnees = code, donnees
+    def __init__(self, code, donnees, entetes=None):
+        self.code, self.donnees, self.entetes = code, donnees, entetes
 
 
 class Application:
@@ -53,6 +57,7 @@ class Application:
         self.verrou = threading.Lock()
         self.mot_de_passe = None  # mot de passe SMTP : en mémoire seulement, jamais écrit sur disque
         self.demo = connecteur.FournisseurDemo()
+        self.acces = acces.Acces(os.environ.get(acces.ENV))  # lecture seule sans identification (voir acces.py)
         if geo.placer_plan(self.cx):  # base importée avant l'enregistrement des coordonnées GPS des sites fictifs
             self.cx.commit()
         if os.path.basename(chemin_base) == "vigie_demo.db" and meteo.lire_config(self.cx)["source"] != "exemple":
@@ -62,6 +67,8 @@ class Application:
                                                    "message": "Températures fictives de la base d'exemple."})
         self.routes = [
             ("GET", r"/api/etat", self.etat),
+            ("POST", acces.SESSION, self.ouvrir_session),
+            ("DELETE", acces.SESSION, self.fermer_session),
             ("GET", r"/api/parc", self.lire_parc),
             ("POST", r"/api/immeubles", self.ecrire_immeuble),
             ("DELETE", r"/api/immeubles/([^/]+)", self.effacer_immeuble),
@@ -71,6 +78,9 @@ class Application:
             ("GET", r"/api/consommation/([^/]+)", self.consommation),
             ("GET", r"/api/immeubles/([^/]+)/fiche", self.lire_fiche),
             ("PUT", r"/api/immeubles/([^/]+)/fiche", self.ecrire_fiche),
+            ("GET", r"/api/immeubles/([^/]+)/declarations", self.lire_declarations),
+            ("POST", r"/api/immeubles/([^/]+)/declarations", self.ecrire_declaration),
+            ("DELETE", r"/api/declarations/(\d+)", self.effacer_declaration),
             ("PUT", r"/api/bons/(\d+)/destinataire", self.destinataire_bon),
             ("POST", r"/api/bons/(\d+)/retour", self.retour_bon),
             ("GET", r"/api/prestataires", self.lire_prestataires),
@@ -150,7 +160,19 @@ class Application:
             # règles qui ne correspondent pas à la granularité des compteurs de leur fluide, compteurs sans règle
             "couverture": parc.liste_regles(cx, service.defauts())["couverture"],
             "smtp_configure": bons.smtp_configure(bons.lire_messagerie(cx)),
+            "acces": self.acces.etat(req.headers),
+            # envoi automatique des bons demandé, mais mot de passe SMTP perdu (redémarrage) : à montrer (règle 3)
+            "smtp_mot_de_passe_manquant": bons.mot_de_passe_manquant(cx, self.mot_de_passe),
         }
+
+    def ouvrir_session(self, req):
+        temoin = self.acces.ouvrir(req.json().get("mot_de_passe"), req.headers)
+        if not temoin:
+            return Reponse(401, {"erreur": "Mot de passe incorrect."})
+        return Reponse(200, {"ok": True}, {"Set-Cookie": temoin})
+
+    def fermer_session(self, req):
+        return Reponse(200, {"ok": True}, {"Set-Cookie": self.acces.fermer(req.headers)})
 
     def etat_meteo(self, fin):
         """La température extérieure conditionne 2 règles : son absence ou son silence doit se voir (règle 3)."""
@@ -186,11 +208,24 @@ class Application:
         f["historique"] = bons.historique(self.cx, iid)
         f["suivis"] = bons.SUIVIS
         f["resultats_retour"] = bons.RESULTATS_RETOUR
+        f["declarations"] = self.lire_declarations(req, iid)
         return f
 
     def ecrire_fiche(self, req, iid):
         parc.enregistrer_fiche(self.cx, iid, req.json())
         return self.lire_fiche(req, iid)
+
+    def lire_declarations(self, req, iid):
+        """Sourdines, périodes de travaux ou de vacance et changements déclarés sur l'immeuble."""
+        return {"declarations": declarations.liste(self.cx, iid), "types": declarations.TYPES,
+                "etats": declarations.ETATS}
+
+    def ecrire_declaration(self, req, iid):
+        declarations.creer(self.cx, iid, req.json())
+        return self.lire_declarations(req, iid)
+
+    def effacer_declaration(self, req, did):
+        return self.lire_declarations(req, declarations.supprimer(self.cx, int(did)))
 
     def destinataire_bon(self, req, bid):
         return bons.changer_destinataire(self.cx, int(bid), req.json().get("destinataire_type"))
@@ -230,6 +265,8 @@ class Application:
     def lire_reglages(self, req):
         return {"automatisation": bons.lire_automatisation(self.cx), "messagerie": bons.lire_messagerie(self.cx),
                 "mot_de_passe_present": bool(self.mot_de_passe or os.environ.get(bons.ENV_MOT_DE_PASSE)),
+                "mot_de_passe_manquant": bons.mot_de_passe_manquant(self.cx, self.mot_de_passe),
+                "analyse_auto": db.lire_parametre(self.cx, planification.PARAM),
                 "gravites": moteur.GRAVITES}
 
     # ------------------------------------------------------------ écriture
@@ -345,7 +382,8 @@ class Application:
             if a.get("gravite_min") not in moteur.GRAVITES:
                 raise parc.ErreurSaisie("Gravité minimale inconnue.")
             db.ecrire_parametre(self.cx, "automatisation", {"mode": a["mode"], "gravite_min": a["gravite_min"],
-                                                            "inclure_donnees": bool(a.get("inclure_donnees"))})
+                                                            "inclure_donnees": bool(a.get("inclure_donnees")),
+                                                            **planification.valider(a, bons.lire_automatisation(self.cx))})
         if "messagerie" in d:
             m = d["messagerie"] or {}
             propre = {}
@@ -585,9 +623,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(contenu)
 
-    def _json(self, code, donnees):
+    def _json(self, code, donnees, entetes=None):
         self._envoyer(code, json.dumps(donnees, ensure_ascii=False, default=str).encode("utf-8"),
-                      "application/json; charset=utf-8")
+                      "application/json; charset=utf-8", entetes)
 
     def _hote_autorise(self):
         hote = (self.headers.get("Host") or "").rsplit(":", 1)[0].lower()
@@ -605,6 +643,8 @@ class Gestionnaire(BaseHTTPRequestHandler):
                 return self._statique(nom)
         if methode != "GET" and self.headers.get("X-Vigie") != "1":
             return self._json(403, {"erreur": "Requête refusée."})
+        if acces.reserve(methode, chemin) and not self.app.acces.autorise(self.headers):
+            return self._json(401, {"erreur": acces.MESSAGE})
         for m, motif, fonction in self.app.routes:
             res = re.fullmatch(motif, chemin) if m == methode else None
             if not res:
@@ -618,7 +658,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
                 traceback.print_exc()
                 return self._json(500, {"erreur": "Erreur interne : voir la fenêtre de commande de Vigie."})
             if isinstance(resultat, Reponse):
-                return self._json(resultat.code, resultat.donnees)
+                return self._json(resultat.code, resultat.donnees, resultat.entetes)
             if isinstance(resultat, Fichier):
                 return self._envoyer(200, resultat.contenu, resultat.type_mime,
                                      {"Content-Disposition": f'attachment; filename="{resultat.nom}"'})
@@ -679,8 +719,11 @@ def meteo_automatique(chemin_base, arret, intervalle_s=meteo.INTERVALLE_AUTO_H *
             return
 
 
-def connecteur_automatique(chemin_base, arret, verification_s=300, premier_delai_s=20):
-    """Fil de fond : relève les compteurs reliés à l'API selon la fréquence choisie (si l'option est cochée)."""
+def connecteur_automatique(chemin_base, arret, verification_s=300, premier_delai_s=20, releve=None):
+    """Fil de fond : relève les compteurs reliés à l'API selon la fréquence choisie (si l'option est cochée).
+
+    `releve` (threading.Event) est levé quand de nouvelles valeurs sont arrivées : l'analyse automatique s'en sert.
+    """
     if arret.wait(premier_delai_s):
         return
     while True:
@@ -689,6 +732,8 @@ def connecteur_automatique(chemin_base, arret, verification_s=300, premier_delai
             if connecteur.a_synchroniser(connecteur.lire_config(cx)):
                 r = connecteur.synchroniser(cx)
                 print(f"Connexion API : {r['message']}")
+                if releve is not None and r["importees"]:
+                    releve.set()
         except (connecteur.ErreurConnecteur, secret.ErreurSecret) as e:
             db.ecrire_parametre(cx, connecteur.PARAM, {**connecteur.lire_config(cx), "statut": "erreur", "message": str(e),
                                                        "derniere_synchro": connecteur._heure().strftime(connecteur.FMT)})
@@ -716,7 +761,7 @@ def creer_serveur(chemin_base, port=8765):
 def lancer(chemin_base, port=8765, ouvrir=True):
     url = f"http://127.0.0.1:{port}/"
     try:
-        serveur, _ = creer_serveur(chemin_base, port)
+        serveur, app = creer_serveur(chemin_base, port)
     except OSError:
         print(f"Vigie semble déjà ouvert (port {port} occupé) : ouvrez {url} dans votre navigateur.")
         if ouvrir:
@@ -727,9 +772,12 @@ def lancer(chemin_base, port=8765, ouvrir=True):
     print("Fermez cette fenêtre (ou Ctrl+C) pour arrêter.")
     if ouvrir:
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
-    arret = threading.Event()
+    arret, releve = threading.Event(), threading.Event()
     threading.Thread(target=meteo_automatique, args=(chemin_base, arret), daemon=True, name="meteo").start()
-    threading.Thread(target=connecteur_automatique, args=(chemin_base, arret), daemon=True, name="connecteur").start()
+    threading.Thread(target=connecteur_automatique, args=(chemin_base, arret), kwargs={"releve": releve}, daemon=True,
+                     name="connecteur").start()
+    threading.Thread(target=planification.analyse_automatique, args=(app, arret, releve), daemon=True,
+                     name="analyse").start()
     try:
         serveur.serve_forever()
     except KeyboardInterrupt:

@@ -1,6 +1,6 @@
 // Fiche technique d'un immeuble : contacts, données techniques, partenaires par fluide, consommation
 // (jour / mois / année), compteurs, suivi horodaté des alertes et des bons, historique.
-import { api, h, vider, fmt, chip, tenter, dialogue, champ, liste, saisie, PROFILS } from './outils.js';
+import { api, h, vider, fmt, chip, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire, PROFILS } from './outils.js';
 import { profilTexte, ouvrirBon } from './pages_suivi.js';
 import { formImmeuble, formCompteur, tableCompteurs, surveillance, supprimerImmeuble } from './pages_parc.js';
 import { icone, pastilleFluide, cleFluide, titreIcone, etatVide } from './icones.js';
@@ -8,7 +8,8 @@ import { icone, pastilleFluide, cleFluide, titreIcone, etatVide } from './icones
 const ECHELLES = [['jour', 'Jour'], ['mois', 'Mois'], ['annee', 'Année']];
 const UNITES = { m3: 'm³', degC: '°C' };
 const CLASSE_SUIVI = { en_attente: 'g-Attente', bon_envoye: 'g-Modérée', retour_incident: 'g-Élevée',
-  a_verifier: 'g-Données', cloturee: 'g-OK' };
+  a_verifier: 'g-Données', cloturee: 'g-OK', sourdine: 'g-Attente' };
+const CLASSE_DECLARATION = { en_cours: 'g-Modérée', en_vigueur: 'g-Données', a_venir: 'g-Attente', echue: 'g-OK' };
 const MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
 
 function libellePeriode(p, echelle) {
@@ -185,9 +186,11 @@ function tableSuivi(f, ctx) {
       h('td', {}, h('div', { class: 'cellule-fluide' }, pastilleFluide(a.gravite === 'Données' ? 'donnees' : a.fluide, { libelle: a.fluide }),
         h('div', {}, h('div', {}, a.titre), h('div', { class: 'ligne-tags' }, chip(a.gravite),
           h('span', { class: 'doux petit' }, a.fluide))))),
-      h('td', {}, h('span', { class: 'chip ' + CLASSE_SUIVI[a.suivi] }, f.suivis[a.suivi])),
+      h('td', {}, h('span', { class: 'chip ' + CLASSE_SUIVI[a.suivi] }, f.suivis[a.suivi]),
+        a.suivi === 'sourdine' ? h('div', { class: 'doux petit' }, `jusqu'au ${fmt.date(a.sourdine.jusquau)} : ${a.sourdine.motif}`) : null),
       h('td', {}, b ? h('button', { type: 'button', class: 'lien', onclick: () => ouvrirBon(b.id, ctx) }, b.numero)
-        : (a.statut === 'ouverte' ? h('button', { type: 'button', class: 'lien', onclick: creer }, 'Créer le bon') : '—'),
+        : (a.statut === 'ouverte' && a.suivi !== 'sourdine'
+          ? h('button', { type: 'button', class: 'lien', onclick: creer }, 'Créer le bon') : '—'),
       b && b.envoye_le ? h('div', { class: 'doux petit' }, 'envoyé le ' + fmt.dateHeure(b.envoye_le)) : null),
       h('td', {}, dest),
       h('td', {}, b && b.retour_le ? [h('span', { class: 'gras' }, f.resultats_retour[b.retour_resultat] || ''),
@@ -207,6 +210,56 @@ function historique(evenements) {
   return h('ol', { class: 'historique' }, evenements.map((e) => h('li', {},
     h('time', { datetime: e.le }, fmt.dateHeure(e.le)), h('span', { class: 'point-etat petit-point ' + (classe[e.type] || 'pe-donnees') }),
     h('span', {}, e.texte))));
+}
+
+// ---------------------------------------------------------------- déclarations : sourdine, travaux, vacance, changement
+
+function formDeclaration(im, regles, types, ctx) {
+  const type = liste('type', Object.entries(types), 'sourdine');
+  const fluides = new Set(im.points.map((p) => p.fluide));
+  const cRegle = champ('Règle mise en sourdine', liste('cause', regles.regles.filter((r) => fluides.has(r.fluide_point))
+    .map((r) => [r.id, r.libelle])), 'La dérive reste calculée et visible « en sourdine », sans bon de travaux.');
+  const cCompteur = champ('Compteur concerné', liste('point_id', [['', 'Tous les compteurs de l\'immeuble'],
+    ...im.points.map((p) => [p.id, `${p.libelle} (${p.id})`])]),
+  'Compteur remplacé, ou compteur de l\'installation dont la consigne ou la courbe de chauffe a changé.');
+  const debut = saisie('debut', '', { type: 'date' });
+  const cDebut = champ('Début', debut);
+  const cFin = champ('Fin', saisie('fin', '', { type: 'date' }), 'Obligatoire : la déclaration cesse seule à cette date.');
+  const ajuster = () => {
+    const t = type.value;
+    cRegle.style.display = t === 'sourdine' ? '' : 'none';
+    cCompteur.style.display = t === 'changement' ? '' : 'none';
+    cFin.style.display = t === 'changement' ? 'none' : '';
+    cDebut.querySelector('label').textContent = { sourdine: 'Début (vide : dès maintenant)',
+      changement: 'Date du changement' }[t] || 'Début';
+  };
+  type.addEventListener('change', ajuster);
+  const form = h('div', { class: 'formulaire' }, champ('Type', type), cRegle, cCompteur, cDebut, cFin,
+    champ('Motif', h('textarea', { name: 'motif', rows: 2 }), 'Obligatoire : il reste affiché avec la déclaration.', 'large'),
+    champ('Auteur', saisie('auteur', '')));
+  ajuster();
+  dialogue(`Déclarer — ${im.nom}`, form, [{ texte: 'Déclarer', classe: 'primaire', action: async () => {
+    const ok = await tenter(() => api('POST', `/api/immeubles/${encodeURIComponent(im.id)}/declarations`, lireFormulaire(form)),
+      'Déclaration enregistrée. Travaux, vacance et changement : pris en compte à la prochaine analyse.');
+    if (ok) await ctx.recharger();
+    return !!ok;
+  } }]);
+}
+
+function tableDeclarations(d, ctx) {
+  if (!d.declarations.length) return etatVide('info', 'Aucune déclaration pour cet immeuble.');
+  const supprimer = async (x) => {
+    if (!await confirmer('Supprimer la déclaration', `${x.libelle} : la suppression est tracée dans l'historique.`, 'Supprimer', true)) return;
+    if (await tenter(() => api('DELETE', '/api/declarations/' + x.id), 'Déclaration supprimée.')) await ctx.recharger();
+  };
+  return h('div', { class: 'defile' }, h('table', {},
+    h('thead', {}, h('tr', {}, ['Déclaration', 'État', 'Motif', 'Déclarée le', ''].map((x) => h('th', { scope: 'col' }, x)))),
+    h('tbody', {}, d.declarations.map((x) => h('tr', {},
+      h('td', {}, x.libelle),
+      h('td', {}, h('span', { class: 'chip ' + CLASSE_DECLARATION[x.etat] }, d.etats[x.etat])),
+      h('td', {}, x.motif, x.auteur ? h('div', { class: 'doux petit' }, x.auteur) : null),
+      h('td', { class: 'nombre' }, fmt.dateHeure(x.cree_le)),
+      h('td', {}, h('button', { type: 'button', class: 'lien', onclick: () => supprimer(x) }, 'Supprimer')))))));
 }
 
 // ---------------------------------------------------------------- page
@@ -249,6 +302,13 @@ export async function pageImmeuble(main, ctx, id) {
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('bon', 'h2', {}, 'Suivi des alertes et des bons'),
         h('span', { class: 'doux petit' }, 'En attente → Bon envoyé (concierge ou partenaire technique) → Retour d\'incident → Clôturée.'))),
       tableSuivi(f, ctx)),
+    h('section', { class: 'carte' },
+      h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('regles', 'h2', {}, 'Périodes déclarées et sourdines'),
+        h('span', { class: 'doux petit' }, 'Sourdine justifiée d\'une règle, travaux ou vacance datés (règles d\'énergie suspendues, '
+          + 'fuites et défauts de données maintenus), changement de compteur, de consigne ou de courbe de chauffe '
+          + '(la référence repart de cette date).')),
+      h('button', { type: 'button', onclick: () => formDeclaration(im, regles, f.declarations.types, ctx) }, icone('ajouter'), 'Déclarer')),
+      tableDeclarations(f.declarations, ctx)),
     h('div', { class: 'colonnes' },
       h('section', { class: 'carte principale' },
         h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('info', 'h2', {}, 'Historique horodaté'),

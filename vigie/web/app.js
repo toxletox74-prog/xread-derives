@@ -1,5 +1,5 @@
 // Vigie — navigation entre les écrans et état général (bandeau, compteurs).
-import { api, h, vider, toast } from './outils.js';
+import { api, h, vider, toast, tenter, dialogue, saisie, champ } from './outils.js';
 import { icone, etatVide } from './icones.js';
 import { pageTableau, pageAlertes, pageBons } from './pages_suivi.js';
 import { pageRejeu } from './rejeu.js';
@@ -59,7 +59,30 @@ async function rafraichirEtat() {
       n ? h('span', { class: 'pastille-nav', title: badge === 'alertes' ? 'alertes critiques' : 'bons à valider' }, n) : null);
   }));
   vider(document.getElementById('base-info'),
-    e.base === 'vigie_demo.db' ? 'Base d\'exemple (données fictives)' : 'Données locales · ' + e.base);
+    e.base === 'vigie_demo.db' ? 'Base d\'exemple (données fictives)' : 'Données locales · ' + e.base, boutonAcces(e.acces));
+}
+
+// Lecture seule sans identification (serveur : acces.py) : le bandeau le dit et propose la connexion
+function boutonAcces(acces) {
+  if (!acces) return null;
+  const lien = (texte, action) => h('button', { type: 'button', class: 'lien', style: 'color:inherit', onclick: action }, texte);
+  if (acces.session) {
+    return lien('Se déconnecter', async () => { await tenter(() => api('DELETE', '/api/session')); await ctx.recharger(); });
+  }
+  if (acces.ecriture) return null;
+  if (!acces.connexion) return ' · Lecture seule';
+  return [' · Lecture seule', lien('Se connecter', () => {
+    const mdp = saisie('mot_de_passe', '', { type: 'password', autocomplete: 'current-password', autofocus: true,
+      onkeydown: (ev) => { if (ev.key === 'Enter') el.querySelector('button.primaire').click(); } });
+    const { el } = dialogue('Se connecter', champ('Mot de passe', mdp, 'Nécessaire pour modifier ; la consultation reste libre.'), [{
+      texte: 'Se connecter', classe: 'primaire', action: async () => {
+        const r = await tenter(() => api('POST', '/api/session', { mot_de_passe: mdp.value }));
+        if (!r) return false;
+        await ctx.recharger();
+        return true;
+      },
+    }]);
+  })];
 }
 
 async function afficher() {
