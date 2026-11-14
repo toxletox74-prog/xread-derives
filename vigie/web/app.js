@@ -104,7 +104,13 @@ async function afficher() {
   ctx.aller('#/');
 }
 
+// Un lien interne suivi depuis un dialogue le ferme, même s'il mène à la page déjà affichée
+document.addEventListener('click', (ev) => {
+  const lien = ev.target.closest('dialog a[href^="#"]');
+  if (lien) lien.closest('dialog').remove();
+});
 window.addEventListener('hashchange', async () => {
+  document.querySelectorAll('dialog').forEach((d) => d.remove());
   window.scrollTo(0, 0);
   await rafraichirEtat();
   await afficher();

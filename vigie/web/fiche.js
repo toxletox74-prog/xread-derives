@@ -1,6 +1,8 @@
 // Fiche technique d'un immeuble : contacts, données techniques, partenaires par fluide, consommation
 // (jour / mois / année), compteurs, suivi horodaté des alertes et des bons, historique.
-import { api, h, vider, fmt, chip, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire, PROFILS } from './outils.js';
+import {
+  api, h, vider, fmt, chip, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire, cliquable, PROFILS,
+} from './outils.js';
 import { profilTexte, ouvrirBon } from './pages_suivi.js';
 import { formImmeuble, formCompteur, tableCompteurs, surveillance, supprimerImmeuble } from './pages_parc.js';
 import { icone, pastilleFluide, cleFluide, titreIcone, etatVide } from './icones.js';
@@ -18,10 +20,11 @@ function libellePeriode(p, echelle) {
   return `${p.slice(8, 10)}.${p.slice(5, 7)}`;
 }
 
-function contact(titre, nom, email, tel, vide) {
+function contact(titre, nom, email, tel, vide, completer) {
   return h('div', { class: 'kpi' }, h('div', { class: 'kpi-tete' }, h('span', { class: 'kpi-ico' }, icone('contact')),
     h('span', { class: 'lib' }, titre)),
-    nom ? h('span', { class: 'gras' }, nom) : h('span', { class: 'doux' }, vide),
+    nom ? h('span', { class: 'gras' }, nom)
+      : h('span', {}, h('span', { class: 'doux' }, vide + ' · '), h('button', { type: 'button', class: 'lien', onclick: completer }, 'Compléter')),
     email ? h('a', { href: 'mailto:' + email, class: 'petit' }, email) : null,
     tel ? h('a', { href: 'tel:' + tel.replace(/\s/g, ''), class: 'petit' }, tel) : null);
 }
@@ -122,13 +125,14 @@ function formFiche(f, ctx) {
   } }], { large: true });
 }
 
-function blocTechnique(f) {
+function blocTechnique(f, completer) {
   const t = f.immeuble.technique || {};
   const lignes = f.listes.technique.filter((c) => t[c.cle] !== undefined && t[c.cle] !== '');
   return h('div', { class: 'kpi technique' }, h('div', { class: 'kpi-tete' }, h('span', { class: 'kpi-ico' }, icone('reglages')),
     h('span', { class: 'lib' }, 'Données techniques')),
     lignes.length ? h('dl', {}, lignes.map((c) => [h('dt', {}, c.libelle), h('dd', {}, String(t[c.cle]))]))
-      : h('span', { class: 'doux' }, 'À compléter (bouton « Modifier la fiche »).'));
+      : h('span', {}, h('span', { class: 'doux' }, 'Non renseignées · '),
+        h('button', { type: 'button', class: 'lien', onclick: completer }, 'Compléter')));
 }
 
 // Bâtiments du site (avec leur identifiant) et installations techniques, issus du classeur patrimoine
@@ -155,17 +159,35 @@ function sectionSite(f) {
         h('td', { class: 'doux petit' }, v(i.remarque))))) : null);
 }
 
-function tablePartenaires(partenaires) {
+// Ouvre la fiche d'un prestataire sur la page Prestataires
+function ouvrirPrestataire(id, ctx) {
+  sessionStorage.setItem('vigie-ouvrir-prestataire', String(id));
+  ctx.aller('#/prestataires');
+}
+
+function tablePartenaires(partenaires, ctx) {
   return h('div', { class: 'defile' }, h('table', {},
     h('thead', {}, h('tr', {}, ['Fluide', 'Métier', 'Partenaire technique', 'Contact', 'E-mail', 'Téléphone']
       .map((x) => h('th', { scope: 'col' }, x)))),
     h('tbody', {}, partenaires.map((p) => h('tr', {},
       h('td', {}, h('span', { class: 'cellule-fluide' }, pastilleFluide(p.fluide), p.libelle)),
       h('td', {}, h('span', { class: 'tag' }, p.metier)),
-      p.prestataire ? [h('td', {}, p.prestataire.nom), h('td', {}, p.prestataire.contact || '—'),
+      p.prestataire ? [h('td', {}, h('button', { type: 'button', class: 'lien', title: 'Ouvrir la fiche du prestataire',
+        onclick: () => ouvrirPrestataire(p.prestataire.id, ctx) }, p.prestataire.nom)), h('td', {}, p.prestataire.contact || '—'),
         h('td', {}, h('a', { href: 'mailto:' + p.prestataire.email }, p.prestataire.email)),
         h('td', {}, p.prestataire.telephone || '—')]
-        : h('td', { colspan: '4' }, h('span', { class: 'chip g-Attente' }, 'Aucun partenaire : à ajouter dans Prestataires')))))));
+        : h('td', { colspan: '4' }, h('a', { href: '#/prestataires', title: 'Ajouter un prestataire' },
+          h('span', { class: 'chip g-Attente' }, 'Aucun partenaire : à ajouter dans Prestataires'))))))));
+}
+
+// Fait défiler jusqu'à la ligne de l'alerte dans « Suivi des alertes et des bons » et la met en évidence
+function montrerAlerte(id) {
+  const tr = document.querySelector(`tr[data-alerte="${CSS.escape(id)}"]`);
+  if (!tr) return;
+  tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  tr.classList.remove('eclair');
+  void tr.offsetWidth; // relance l'animation
+  tr.classList.add('eclair');
 }
 
 // ---------------------------------------------------------------- suivi des alertes et historique
@@ -181,7 +203,7 @@ function tableSuivi(f, ctx) {
       const r = await api('POST', `/api/alertes/${encodeURIComponent(a.id)}/bon`, {});
       await ouvrirBon(r.bon.id, ctx);
     });
-    return h('tr', {},
+    return h('tr', { ...(b ? cliquable(() => ouvrirBon(b.id, ctx), 'Ouvrir le bon ' + b.numero) : {}), 'data-alerte': a.id },
       h('td', { class: 'nombre' }, fmt.dateHeure(a.ouverte_le)),
       h('td', {}, h('div', { class: 'cellule-fluide' }, pastilleFluide(a.gravite === 'Données' ? 'donnees' : a.fluide, { libelle: a.fluide }),
         h('div', {}, h('div', {}, a.titre), h('div', { class: 'ligne-tags' }, chip(a.gravite),
@@ -203,11 +225,14 @@ function tableSuivi(f, ctx) {
     h('tbody', {}, f.alertes.map(ligne))));
 }
 
-function historique(evenements) {
+function historique(evenements, ctx) {
   if (!evenements.length) return etatVide('info', 'Aucun événement enregistré.');
   const classe = { alerte_ouverte: 'pe-critique', alerte_rouverte: 'pe-critique', alerte_resolue: 'pe-ok', bon: 'pe-moderee',
     avis: 'pe-donnees' };
-  return h('ol', { class: 'historique' }, evenements.map((e) => h('li', {},
+  // un événement de bon ouvre le bon ; un événement d'alerte montre l'alerte dans le suivi
+  const action = (e) => (e.bon_id ? cliquable(() => ouvrirBon(e.bon_id, ctx), 'Ouvrir le bon ' + (e.numero || ''))
+    : e.alerte_id ? cliquable(() => montrerAlerte(e.alerte_id), 'Voir l\'alerte dans le suivi') : {});
+  return h('ol', { class: 'historique' }, evenements.map((e) => h('li', action(e),
     h('time', { datetime: e.le }, fmt.dateHeure(e.le)), h('span', { class: 'point-etat petit-point ' + (classe[e.type] || 'pe-donnees') }),
     h('span', {}, e.texte))));
 }
@@ -273,35 +298,41 @@ export async function pageImmeuble(main, ctx, id) {
   const fi = f.immeuble;
   const conso = sectionConsommation(im.points);
   const ouverts = f.alertes.filter((a) => a.statut === 'ouverte').length;
+  const completer = () => formFiche(f, ctx);
+  const suivi = h('section', { class: 'carte' },
+    h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('bon', 'h2', {}, 'Suivi des alertes et des bons'),
+      h('span', { class: 'doux petit' }, 'En attente → Bon envoyé (concierge ou partenaire technique) → Retour d\'incident → Clôturée. '
+        + 'Cliquez sur une ligne pour ouvrir son bon de travaux.'))),
+    tableSuivi(f, ctx));
   vider(main,
     h('div', { class: 'entete-page' },
       h('div', { class: 'titres' },
         h('a', { href: '#/parc', class: 'petit retour-lien' }, icone('retour'), 'Parc'),
         h('h1', {}, im.nom),
         h('div', { class: 'fluides' }, [...new Map(im.points.filter((p) => p.etat !== 'inactif')
-          .map((p) => [cleFluide(p.fluide), p])).values()].map((p) => pastilleFluide(p.fluide, { taille: 'sm', libelle: p.libelle }))),
+          .map((p) => [cleFluide(p.fluide), p])).values()].map((p) => h('button', { type: 'button', class: 'nu',
+          title: `Consommation : ${p.libelle}`, onclick: () => conso.choisir(p.id) }, pastilleFluide(p.fluide, { taille: 'sm', libelle: p.libelle })))),
         h('p', { class: 'doux' }, `${ad.rue}, ${ad.npa_localite} · code ${im.id}${im.typologie ? ' · ' + im.typologie : ''} · ${profilTexte(im)}`
-          + (im.proprietaire ? ` · propriétaire : ${im.proprietaire}` : '') + ` · ${ouverts} alerte(s) ouverte(s)`)),
+          + (im.proprietaire ? ` · propriétaire : ${im.proprietaire}` : '') + ' · ',
+        h('a', { href: '#suivi', onclick: (ev) => { ev.preventDefault(); suivi.scrollIntoView({ behavior: 'smooth', block: 'start' }); } },
+          `${ouverts} alerte(s) ouverte(s)`))),
       h('div', { class: 'actions' },
         h('button', { type: 'button', class: 'danger', onclick: () => supprimerImmeuble(im, ctx) }, icone('supprimer'), 'Supprimer'),
         h('button', { type: 'button', onclick: () => formImmeuble(im, parc, ctx) }, icone('immeuble'), 'Modifier l\'immeuble'),
         h('button', { type: 'button', class: 'primaire', onclick: () => formFiche(f, ctx) }, icone('modifier'), 'Modifier la fiche'))),
     im.remarque ? h('div', { class: 'banniere info' }, h('span', {}, im.remarque)) : null,
     h('section', { class: 'grille-fiche', 'aria-label': 'Contacts et données techniques' },
-      contact('Gestionnaire', fi.gestionnaire, fi.gestionnaire_email, fi.gestionnaire_tel, 'Non renseigné'),
-      contact('Concierge', fi.concierge, fi.concierge_email, fi.concierge_tel, 'Non renseigné'),
-      blocTechnique(f)),
+      contact('Gestionnaire', fi.gestionnaire, fi.gestionnaire_email, fi.gestionnaire_tel, 'Non renseigné', completer),
+      contact('Concierge', fi.concierge, fi.concierge_email, fi.concierge_tel, 'Non renseigné', completer),
+      blocTechnique(f, completer)),
     h('section', { class: 'carte' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('prestataire', 'h2', {}, 'Partenaires techniques par fluide'),
         h('span', { class: 'doux petit' }, 'Qui intervient sur chaque installation de l\'immeuble (gérés dans Prestataires).')),
       h('a', { href: '#/prestataires', class: 'petit' }, 'Prestataires')),
-      tablePartenaires(f.partenaires)),
+      tablePartenaires(f.partenaires, ctx)),
     sectionSite(f),
     conso,
-    h('section', { class: 'carte' },
-      h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('bon', 'h2', {}, 'Suivi des alertes et des bons'),
-        h('span', { class: 'doux petit' }, 'En attente → Bon envoyé (concierge ou partenaire technique) → Retour d\'incident → Clôturée.'))),
-      tableSuivi(f, ctx)),
+    suivi,
     h('section', { class: 'carte' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('regles', 'h2', {}, 'Périodes déclarées et sourdines'),
         h('span', { class: 'doux petit' }, 'Sourdine justifiée d\'une règle, travaux ou vacance datés (règles d\'énergie suspendues, '
@@ -313,7 +344,7 @@ export async function pageImmeuble(main, ctx, id) {
       h('section', { class: 'carte principale' },
         h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('info', 'h2', {}, 'Historique horodaté'),
           h('span', { class: 'doux petit' }, 'Toutes les étapes, de la plus récente à la plus ancienne (heure de Genève).'))),
-        h('div', { class: 'carte-corps' }, historique(f.historique))),
+        h('div', { class: 'carte-corps' }, historique(f.historique, ctx))),
       h('section', { class: 'carte laterale' },
         h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('regles', 'h2', {}, 'Surveillance appliquée'),
           h('span', { class: 'doux petit' }, `Occupation « ${PROFILS[im.profil]} »`)), h('a', { href: '#/regles', class: 'petit' }, 'Régler')),

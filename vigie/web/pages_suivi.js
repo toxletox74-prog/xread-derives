@@ -1,10 +1,10 @@
 // Écrans de suivi : tableau de bord, alertes, bons de travaux.
 import {
   api, h, vider, fmt, enjeu, chip, chipStatut, toast, tenter, dialogue, confirmer, champ, liste, saisie, telecharger,
-  PROFILS, RETOURS, STATUTS_BON,
+  cliquable, allerAlertes, PROFILS, RETOURS, STATUTS_BON,
 } from './outils.js';
 import { carteParc } from './carte.js';
-import { MOT_DE_PASSE_MANQUANT } from './pages_reglages.js';
+import { MOT_DE_PASSE_MANQUANT, ouvrirTarifs } from './pages_reglages.js';
 import { icone, pastilleFluide, tagFluide, cleFluide, libelleFluide, titreIcone, etatVide } from './icones.js';
 
 const GRAVITES = ['Critique', 'Élevée', 'Modérée', 'Données'];
@@ -23,41 +23,44 @@ export async function pageTableau(main, ctx) {
     + (e.derniere_analyse ? ` · analyse du ${fmt.dateHeure(e.derniere_analyse.le)}` : '');
   const bannieres = [];
   if (e.tarifs_exemple) {
-    bannieres.push(h('div', { class: 'banniere attention' },
-      h('span', {}, 'Les montants en CHF utilisent des tarifs d\'exemple. Saisissez vos tarifs de contrat pour des enjeux réels.'),
-      h('a', { class: 'bouton', href: '#/regles' }, 'Saisir mes tarifs')));
+    bannieres.push(banniere('attention',
+      'Les montants en CHF utilisent des tarifs d\'exemple. Saisissez vos tarifs de contrat pour des enjeux réels.',
+      h('button', { type: 'button', onclick: () => tenter(() => ouvrirTarifs(ctx)) }, 'Saisir mes tarifs')));
   }
   if (e.fin_donnees && !e.meteo.ok && !e.climat_mensuel) {
-    bannieres.push(h('div', { class: 'banniere attention' },
-      h('span', {}, e.meteo.derniere
-        ? `Température extérieure muette depuis le ${fmt.dateHeure(e.meteo.derniere)} : `
-          + 'les règles « chauffage trop fort pour la météo » et « rendement PAC » ne sont pas fiables.'
-        : 'Aucune température extérieure : les règles « chauffage trop fort pour la météo » et « rendement PAC » ne tournent pas.'),
-      h('a', { class: 'bouton', href: '#/reglages' }, 'Voir la source météo')));
+    bannieres.push(banniere('attention', e.meteo.derniere
+      ? `Température extérieure muette depuis le ${fmt.dateHeure(e.meteo.derniere)} : `
+        + 'les règles « chauffage trop fort pour la météo » et « rendement PAC » ne sont pas fiables.'
+      : 'Aucune température extérieure : les règles « chauffage trop fort pour la météo » et « rendement PAC » ne tournent pas.',
+    h('a', { class: 'bouton', href: '#/reglages' }, 'Voir la source météo')));
   }
   if (e.smtp_mot_de_passe_manquant) {
-    bannieres.push(h('div', { class: 'banniere attention' }, h('span', {}, MOT_DE_PASSE_MANQUANT),
+    bannieres.push(banniere('attention', MOT_DE_PASSE_MANQUANT,
       h('a', { class: 'bouton', href: '#/reglages' }, 'Saisir le mot de passe')));
   }
   const c = e.couverture || {};
-  if (c.sans_effet || c.compteurs_sans_regle) {
-    bannieres.push(h('div', { class: 'banniere attention' },
-      h('span', {}, [c.sans_effet ? `${c.sans_effet} règle(s) active(s) ne tournent sur aucun compteur : le relevé de vos `
+  if ((c.sans_effet || c.compteurs_sans_regle) && !couvertureVue(c)) {
+    const detail = (c.sans_regle || []).map((s) => `${s.fluide} : ${s.compteurs} relevé(s) ${s.pas}`).join(' · ');
+    bannieres.push(banniere('attention',
+      [c.sans_effet ? `${c.sans_effet} règle(s) active(s) ne tournent sur aucun compteur : le relevé de vos `
         + 'compteurs est trop grossier pour elles.' : null,
-      c.compteurs_sans_regle ? ` ${c.compteurs_sans_regle} compteur(s) n'ont aucune règle de dérive.` : null]),
-      h('a', { class: 'bouton', href: '#/regles' }, 'Voir la couverture des règles')));
+      c.compteurs_sans_regle ? ` ${c.compteurs_sans_regle} compteur(s) n'ont aucune règle de dérive (${detail}) : `
+        + 'seule la qualité de leurs données est contrôlée.' : null],
+      h('button', { type: 'button', onclick: () => { sessionStorage.setItem('vigie-regles-ancre', 'couverture'); ctx.aller('#/regles'); } },
+        'Voir la couverture des règles'),
+      h('button', { type: 'button', class: 'lien', title: 'Masquer ce bandeau tant que la couverture ne change pas',
+        onclick: () => { couvertureVue(c, true); ctx.aller('#/'); } }, 'J\'ai compris')));
   }
   if (k.bons_brouillon) {
-    bannieres.push(h('div', { class: 'banniere info' },
-      h('span', {}, `${k.bons_brouillon} bon(s) de travaux prêt(s) : relisez et envoyez au prestataire.`),
+    bannieres.push(banniere('info', `${k.bons_brouillon} bon(s) de travaux prêt(s) : relisez et envoyez au prestataire.`,
       h('a', { class: 'bouton primaire', href: '#/bons' }, 'Voir les bons')));
   }
   if (e.compteurs.a_connecter) {
-    bannieres.push(h('div', { class: 'banniere info' },
-      h('span', {}, `${e.compteurs.a_connecter} compteur(s) déclaré(s) mais pas encore connecté(s) : aucune donnée reçue.`),
+    bannieres.push(banniere('info', `${e.compteurs.a_connecter} compteur(s) déclaré(s) mais pas encore connecté(s) : aucune donnée reçue.`,
       h('a', { class: 'bouton', href: '#/imports' }, 'Importer des mesures')));
   }
   const pert = k.pertinence;
+  const vers = (hash) => () => ctx.aller(hash);
   vider(main,
     h('div', { class: 'entete-page' },
       h('div', { class: 'titres' }, h('h1', {}, 'Tableau de bord du parc'), h('p', { class: 'doux' }, sousTitre)),
@@ -65,47 +68,66 @@ export async function pageTableau(main, ctx) {
     bannieres,
     h('section', { class: 'grille-kpi', 'aria-label': 'Indicateurs clés' },
       kpi('alerte', 'Alertes ouvertes', fmt.n0(k.alertes), `dont ${k.critiques} critique(s) · ${k.donnees} problème(s) de données`,
-        k.critiques ? 'ton-crit' : 'ton-ok', repartitionGravite(alertes)),
+        k.critiques ? 'ton-crit' : 'ton-ok', repartitionGravite(alertes, ctx), vers('#/alertes')),
       kpi('argent', 'Rythme des dérives ouvertes', fmt.chf(k.chf_mois, 'CHF/mois'),
         (k.chf_mesure ? `dérives constatées ${fmt.chf(k.chf_mesure)} · ` : 'tous fluides · ')
-        + (e.tarifs_exemple ? 'tarifs d\'exemple, à remplacer' : 'aux conditions actuelles')),
+        + (e.tarifs_exemple ? 'tarifs d\'exemple, à remplacer' : 'aux conditions actuelles'), '', null, vers('#/alertes')),
       kpi('courbe', "Projection si rien n'est fait", fmt.chf(k.chf_proj, 'CHF sur 12 mois'),
-        'hypothèses : climat normal de Genève, dérive constante — information, pas un déclencheur'),
+        'hypothèses : climat normal de Genève, dérive constante — information, pas un déclencheur', '', null, vers('#/alertes')),
       kpi('energie', 'Énergie et eau en dérive', '≈ ' + fmt.n1((k.kwh_mois || 0) / 1000) + ' MWh/mois',
-        k.m3_mois ? `et ≈ ${fmt.n0(k.m3_mois)} m³ d'eau par mois` : 'chaleur, PAC et électricité'),
-      kpi('co2', 'Émissions évitables', '≈ ' + fmt.n1(k.co2_t_mois) + ' t CO₂/mois', 'facteurs d\'émission par vecteur', 'ton-ok'),
+        k.m3_mois ? `et ≈ ${fmt.n0(k.m3_mois)} m³ d'eau par mois` : 'chaleur, PAC et électricité', '', null, vers('#/alertes')),
+      kpi('co2', 'Émissions évitables', '≈ ' + fmt.n1(k.co2_t_mois) + ' t CO₂/mois', 'facteurs d\'émission par vecteur', 'ton-ok', null,
+        vers('#/regles')),
       kpi('bon', 'Bons de travaux en cours', fmt.n0(k.bons_ouverts),
-        k.bons_brouillon ? `dont ${k.bons_brouillon} à valider` : 'aucun en attente de validation', k.bons_brouillon ? 'ton-elev' : ''),
+        k.bons_brouillon ? `dont ${k.bons_brouillon} à valider` : 'aucun en attente de validation', k.bons_brouillon ? 'ton-elev' : '',
+        null, vers('#/bons')),
       kpi('pertinence', 'Pertinence des alertes', pert.taux === null ? '—' : fmt.pct(pert.taux),
-        pert.retours ? `${pert.pertinentes} pertinente(s) sur ${pert.retours} retour(s)` : 'donnez votre avis sur chaque alerte')),
+        pert.retours ? `${pert.pertinentes} pertinente(s) sur ${pert.retours} retour(s)` : 'donnez votre avis sur chaque alerte', '', null, vers('#/alertes'))),
     carte,
     h('section', { class: 'carte', 'aria-labelledby': 't-alertes' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' },
         titreIcone('alerte', 'h2', { id: 't-alertes' }, 'À traiter, par priorité'),
         h('span', { class: 'doux petit' }, 'Classement : rythme mensuel en CHF × confiance × urgence (× 1,5 si risque de sinistre)'
           + ' · 1 alerte par cause et par immeuble')),
-      repartitionFluides(alertes)),
+      repartitionFluides(alertes, ctx)),
       listeAlertes(alertes, ctx, 'Aucune dérive en cours. Les compteurs analysés se comportent comme attendu.')));
   carte.monter();
 }
 
-function kpi(ico, lib, val, sous, ton = '', extra = null) {
-  return h('div', { class: 'kpi' },
+// Bandeau d'action : un clic n'importe où dans le bandeau déclenche sa première action (lien ou bouton)
+function banniere(ton, texte, ...actions) {
+  return h('div', { class: 'banniere cliquable ' + ton,
+    onclick: (ev) => { if (!ev.target.closest('a, button')) ev.currentTarget.querySelector('a, button').click(); } },
+  h('span', {}, texte), h('div', { class: 'actions' }, actions));
+}
+
+// « J'ai compris » sur le bandeau de couverture : mémorisé dans ce navigateur, le bandeau revient si la couverture change
+function couvertureVue(c, marquer = false) {
+  const signature = JSON.stringify([c.sans_effet, c.compteurs_sans_regle, c.sans_regle]);
+  try {
+    if (marquer) localStorage.setItem('vigie-couverture-vue', signature);
+    return localStorage.getItem('vigie-couverture-vue') === signature;
+  } catch { return false; }
+}
+
+function kpi(ico, lib, val, sous, ton = '', extra = null, action = null) {
+  return h('div', action ? cliquable(action, 'Voir le détail', 'kpi') : { class: 'kpi' },
     h('div', { class: 'kpi-tete' }, h('span', { class: 'kpi-ico ' + ton }, icone(ico)), h('span', { class: 'lib' }, lib)),
     h('span', { class: 'val' }, val), extra, h('span', { class: 'sous' }, sous));
 }
 
 // Nombre d'alertes ouvertes par gravité (comptage des alertes reçues du moteur)
-function repartitionGravite(alertes) {
+function repartitionGravite(alertes, ctx) {
   const n = (g) => alertes.filter((a) => a.gravite === g).length;
   const presentes = GRAVITES.filter((g) => n(g));
   if (!presentes.length) return null;
   return h('div', { class: 'repartition', 'aria-label': 'Alertes par gravité' },
-    presentes.map((g) => h('span', { class: 'chip g-' + g }, `${g} ${n(g)}`)));
+    presentes.map((g) => h('button', { type: 'button', class: 'nu', title: `Voir les alertes « ${g} »`,
+      onclick: () => allerAlertes(ctx, { gravite: g }) }, h('span', { class: 'chip g-' + g }, `${g} ${n(g)}`))));
 }
 
 // Répartition des alertes par fluide : pastille + libellé + nombre
-function repartitionFluides(alertes) {
+function repartitionFluides(alertes, ctx) {
   const parCle = new Map();
   alertes.filter((a) => a.gravite !== 'Données').forEach((a) => {
     const c = cleFluide(a.fluide);
@@ -113,8 +135,9 @@ function repartitionFluides(alertes) {
   });
   if (!parCle.size) return null;
   return h('div', { class: 'repartition', 'aria-label': 'Alertes par fluide' },
-    [...parCle].map(([c, n]) => h('span', { class: 'tag-fluide f-' + c }, pastilleFluide(c, { taille: 'xs' }),
-      h('span', {}, `${libelleFluide(c)} · ${n}`))));
+    [...parCle].map(([c, n]) => h('button', { type: 'button', class: 'nu', title: `Voir les alertes ${libelleFluide(c)}`,
+      onclick: () => allerAlertes(ctx, { fluide: c }) }, h('span', { class: 'tag-fluide f-' + c }, pastilleFluide(c, { taille: 'xs' }),
+      h('span', {}, `${libelleFluide(c)} · ${n}`)))));
 }
 
 function accueil(main, ctx) {
@@ -223,16 +246,19 @@ function carteAlerte(a, rang, ctx) {
 export async function pageAlertes(main, ctx) {
   const statut = sessionStorage.getItem('vigie-alertes-statut') || 'ouverte';
   const { alertes } = await api('GET', '/api/alertes?statut=' + statut);
-  const filtres = { gravite: '', fluide: '', q: '' };
+  const recus = JSON.parse(sessionStorage.getItem('vigie-alertes-filtres') || '{}');
+  sessionStorage.removeItem('vigie-alertes-filtres');
+  const filtres = { gravite: recus.gravite || '', fluide: recus.fluide || '', q: '' };
   const zone = h('div', {});
   const rendre = () => {
     const q = filtres.q.toLowerCase();
     const vis = alertes.filter((a) => (!filtres.gravite || a.gravite === filtres.gravite)
-      && (!filtres.fluide || a.fluide === filtres.fluide)
+      && (!filtres.fluide || cleFluide(a.fluide) === filtres.fluide)
       && (!q || `${a.immeuble} ${a.adresse} ${a.titre}`.toLowerCase().includes(q)));
     vider(zone, listeAlertes(vis, ctx, 'Aucune alerte ne correspond.'));
   };
-  const fluides = [...new Set(alertes.map((a) => a.fluide))].sort();
+  const fluides = [...new Set(alertes.map((a) => cleFluide(a.fluide)))].map((c) => [c, libelleFluide(c)])
+    .sort((x, y) => x[1].localeCompare(y[1], 'fr'));
   vider(main,
     h('div', { class: 'entete-page' },
       h('div', { class: 'titres' }, h('h1', {}, 'Alertes'),
@@ -241,8 +267,8 @@ export async function pageAlertes(main, ctx) {
       h('div', { class: 'actions' }, boutonAnalyse(ctx))),
     h('div', { class: 'filtres' },
       champ('Afficher', liste('statut', [['ouverte', 'Alertes ouvertes'], ['sourdine', 'En sourdine'], ['resolue', 'Alertes résolues'], ['toutes', 'Toutes']], statut)),
-      champ('Gravité', liste('gravite', [['', 'Toutes'], 'Critique', 'Élevée', 'Modérée', 'Données'], '')),
-      champ('Fluide', liste('fluide', [['', 'Tous les fluides'], ...fluides], '')),
+      champ('Gravité', liste('gravite', [['', 'Toutes'], 'Critique', 'Élevée', 'Modérée', 'Données'], filtres.gravite)),
+      champ('Fluide', liste('fluide', [['', 'Tous les fluides'], ...fluides], filtres.fluide)),
       champ('Rechercher', h('input', { type: 'search', name: 'q', placeholder: 'Immeuble, adresse…' }))),
     h('section', { class: 'carte' }, zone));
   main.querySelector('select[name=statut]').addEventListener('change', (ev) => {
@@ -262,10 +288,9 @@ export async function pageBons(main, ctx) {
   const { bons } = await api('GET', '/api/bons');
   let filtre = 'ouverts';
   const corps = h('tbody', {});
-  const ligne = (b) => h('tr', { class: 'cliquable', tabindex: '0',
-    onclick: () => ouvrirBon(b.id, ctx), onkeydown: (ev) => { if (ev.key === 'Enter') ouvrirBon(b.id, ctx); } },
+  const ligne = (b) => h('tr', cliquable(() => ouvrirBon(b.id, ctx), 'Ouvrir le bon ' + b.numero),
   h('td', { class: 'gras sans-retour' }, b.numero),
-  h('td', {}, b.immeuble || b.immeuble_id),
+  h('td', {}, h('a', { href: '#/immeuble/' + encodeURIComponent(b.immeuble_id) }, b.immeuble || b.immeuble_id)),
   h('td', {}, h('div', { class: 'cellule-fluide' }, b.alerte.fluide ? pastilleFluide(b.alerte.fluide, { libelle: b.alerte.fluide }) : null,
     h('div', {}, h('div', {}, b.alerte.titre || ''), b.alerte.gravite ? chip(b.alerte.gravite) : null))),
   h('td', {}, b.prestataire || h('span', { class: 'chip g-Attente' }, 'à choisir')),
@@ -322,7 +347,8 @@ export async function ouvrirBon(id, ctx) {
   const contenu = h('div', { class: 'pile' },
     h('div', { class: 'ligne-tags' },
       chipStatut(b.statut), a.gravite ? chip(a.gravite) : null, a.fluide ? tagFluide(a.fluide) : null,
-      h('span', { class: 'doux lien-immeuble' }, icone('immeuble'), `${b.immeuble || ''} · ${a.adresse || ''}`)),
+      h('a', { class: 'lien-immeuble', href: '#/immeuble/' + encodeURIComponent(b.immeuble_id), title: 'Ouvrir la fiche de l\'immeuble' },
+        icone('immeuble'), `${b.immeuble || ''} · ${a.adresse || ''}`)),
     h('div', { class: 'resume-import' },
       h('div', {}, h('div', { class: 'doux petit' }, 'Enjeu chiffré'), h('b', {}, enjeu(a).principal),
         h('div', { class: 'doux petit' }, enjeu(a).precisions.slice(0, 2).join(' · '))),

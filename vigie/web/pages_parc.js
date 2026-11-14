@@ -1,7 +1,7 @@
 // Écrans du parc : adresses et immeubles, fiche immeuble (compteurs et connexions), imports.
 import {
   api, h, vider, fmt, chip, chipStatut, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire,
-  telecharger, graphe, toast, PROFILS, ETATS_POINT,
+  telecharger, graphe, toast, cliquable, PROFILS, ETATS_POINT,
 } from './outils.js';
 import { pastillesFluides, profilTexte, listeAlertes, ouvrirBon } from './pages_suivi.js';
 import { icone, pastilleFluide, titreIcone, etatVide } from './icones.js';
@@ -198,7 +198,8 @@ export function surveillance(im, regles, sesBons, ctx) {
     && p.pas_min >= r.pas_releve[0] && p.pas_min <= r.pas_releve[1]);
   return h('div', { class: 'carte-corps' },
     actives.length ? h('ul', { class: 'liste-regles' },
-      actives.map((r) => h('li', {}, pastilleFluide(r.fluide, { taille: 'xs' }), h('span', {}, h('span', { class: 'gras' }, r.libelle),
+      actives.map((r) => h('li', {}, pastilleFluide(r.fluide, { taille: 'xs' }), h('span', {},
+        h('a', { class: 'gras', href: '#/regles', title: 'Régler cette règle' }, r.libelle),
         ` — seuil ${fmt.n1(r.seuil)} ${r.unite_seuil}, sur ${r.persistance} ${r.unite_persistance}`,
         manque(r) ? h('span', { class: 'doux petit' }, ' (pas de compteur actif pour ce fluide)')
           : auBonPas(r) || !tropGrossier(r) ? null : [' ', h('span', { class: 'chip g-Attente' }, `sans effet ici : demande un relevé ${r.releve}`)],
@@ -207,7 +208,7 @@ export function surveillance(im, regles, sesBons, ctx) {
       : h('p', { class: 'doux' }, 'Aucune règle de dérive pour cette occupation.'),
     h('p', { class: 'doux petit' }, 'Toujours appliqué : contrôle de la qualité des données de chaque compteur.'),
     h('h3', {}, 'Bons de travaux'),
-    sesBons.length ? h('ul', { class: 'journal' }, sesBons.map((b) => h('li', {},
+    sesBons.length ? h('ul', { class: 'journal' }, sesBons.map((b) => h('li', cliquable(() => ouvrirBon(b.id, ctx), 'Ouvrir le bon ' + b.numero),
       h('button', { type: 'button', class: 'lien', onclick: () => ouvrirBon(b.id, ctx) }, b.numero),
       chipStatut(b.statut), h('span', { class: 'doux petit' }, b.alerte.titre || ''))))
       : h('p', { class: 'doux' }, 'Aucun bon de travaux.'));
@@ -226,7 +227,7 @@ export function tableCompteurs(im, parc, ctx, zoneGraphe) {
       .map((t, i) => h('th', { scope: 'col', class: [3, 6].includes(i) ? 'nombre' : null }, t)))),
     h('tbody', {}, im.points.map((p) => {
       const g = p.alertes.length ? ['Critique', 'Élevée', 'Modérée', 'Données'].find((x) => p.alertes.includes(x)) : null;
-      return h('tr', {},
+      return h('tr', p.derniere ? cliquable(() => zoneGraphe.choisir(p.id), 'Afficher la courbe de ce compteur') : {},
         h('td', {}, h('span', { class: 'cellule-fluide' }, pastilleFluide(p.fluide), libFluide(p.fluide))),
         h('td', {}, p.libelle, h('div', { class: 'doux petit' }, p.id + (p.fournisseur ? ' · ' + p.fournisseur : '')
           + (p.puissance_crete_kwc ? ` · ${fmt.n1(p.puissance_crete_kwc)} kWc` : '')

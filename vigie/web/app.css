@@ -260,7 +260,17 @@ th { text-align: left; font-size: 11.5px; font-weight: 650; color: var(--doux); 
 td { padding: 11px 12px; border-bottom: 1px solid var(--bord-leger); vertical-align: top; }
 tr:last-child td { border-bottom: none; }
 td.nombre, th.nombre { text-align: right; white-space: nowrap; }
-tr.cliquable { cursor: pointer; } tr.cliquable:hover td { background: var(--survol); }
+.cliquable { cursor: pointer; } tr.cliquable:hover td { background: var(--survol); }
+.kpi.cliquable, li.cliquable { transition: border-color .12s, background-color .12s; }
+.kpi.cliquable:hover { border-color: var(--bleu); }
+li.cliquable { border-radius: var(--rayon-xs); padding: 2px 4px; margin: 0 -4px; } li.cliquable:hover { background: var(--survol); }
+.cliquable:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+/* bouton « nu » : rend cliquable une pastille, un chip ou un tag sans changer son apparence */
+button.nu { all: unset; display: inline-flex; cursor: pointer; border-radius: 999px; }
+button.nu:hover > * { filter: brightness(.94); box-shadow: 0 0 0 2px var(--bord-champ); }
+button.nu:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+tr.eclair td { animation: eclair 1.6s ease-out; }
+@keyframes eclair { from { background: var(--bleu-pale); } to { background: transparent; } }
 .cellule-fluide { display: flex; align-items: center; gap: 10px; font-weight: 600; min-width: 150px; }
 .centre { text-align: center; }
 .sans-retour { white-space: nowrap; }

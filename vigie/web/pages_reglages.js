@@ -1,6 +1,6 @@
 // Écrans de réglage : prestataires, règles et coûts de la dérive, automatisation et messagerie.
 import {
-  api, h, vider, fmt, chip, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire, PROFILS,
+  api, h, vider, fmt, chip, tenter, dialogue, confirmer, champ, liste, saisie, lireFormulaire, cliquable, PROFILS,
 } from './outils.js';
 import { icone, pastilleFluide, tagFluide, titreIcone, etatVide } from './icones.js';
 import { carteConnecteur } from './connecteur.js';
@@ -27,17 +27,23 @@ export async function pagePrestataires(main, ctx) {
     h('section', { class: 'carte' }, h('div', { class: 'defile' }, h('table', {},
       h('thead', {}, h('tr', {}, ['Entreprise', 'Métier', 'Contact', 'E-mail', 'Téléphone', 'Immeubles couverts', 'État']
         .map((t) => h('th', { scope: 'col' }, t)))),
-      h('tbody', {}, prestataires.length ? prestataires.map((p) => h('tr', { class: 'cliquable', tabindex: '0',
-        onclick: () => ouvrir(p), onkeydown: (ev) => { if (ev.key === 'Enter') ouvrir(p); } },
+      h('tbody', {}, prestataires.length ? prestataires.map((p) => h('tr', cliquable(() => ouvrir(p), 'Modifier ' + p.nom),
       h('td', {}, h('span', { class: 'cellule-fluide' }, h('span', { class: 'kpi-ico' }, icone('prestataire')), p.nom)),
       h('td', {}, h('span', { class: 'tag' }, p.metier)), h('td', {}, p.contact || '—'),
-      h('td', {}, p.email), h('td', {}, p.telephone || '—'),
+      h('td', {}, h('a', { href: 'mailto:' + p.email }, p.email)),
+      h('td', {}, p.telephone ? h('a', { href: 'tel:' + p.telephone.replace(/\s/g, '') }, p.telephone) : '—'),
       h('td', {}, p.perimetre === '*' ? 'Tout le parc' : !p.perimetre ? 'Aucun immeuble (à rattacher)'
         : p.perimetre.split(',').length > 6 ? `${p.perimetre.split(',').length} immeubles : ${p.perimetre.split(',').join(', ')}`
-          : p.perimetre.split(',').map((i) => nomImm[i] || i).join(', ')),
+          : p.perimetre.split(',').map((i, n) => [n ? ', ' : null,
+            h('a', { href: '#/immeuble/' + encodeURIComponent(i) }, nomImm[i] || i)])),
       h('td', {}, p.actif ? h('span', { class: 'chip g-OK' }, 'Actif') : h('span', { class: 'chip g-Données' }, 'Inactif'))))
         : h('tr', {}, h('td', { colspan: '7' }, etatVide('prestataire',
           'Aucun prestataire. Ajoutez-les ici ou dans la feuille « Prestataires » de l\'import Excel.'))))))));
+  // arrivée depuis la fiche d'un immeuble : ouvre directement le prestataire demandé
+  const demande = sessionStorage.getItem('vigie-ouvrir-prestataire');
+  sessionStorage.removeItem('vigie-ouvrir-prestataire');
+  const cible = demande && prestataires.find((p) => String(p.id) === demande);
+  if (cible) ouvrir(cible);
 }
 
 function formPrestataire(p, metiers, immeubles, ctx) {
@@ -110,6 +116,14 @@ export async function pageRegles(main, ctx) {
           + 'un pic isolé n\'est pas une alerte.'))),
       r.regles.map((x) => blocRegle(x, r, ctx))),
     blocCouts(couts, ctx));
+  // arrivée depuis un bandeau du tableau de bord : amène à la section concernée et la signale
+  const ancre = sessionStorage.getItem('vigie-regles-ancre');
+  sessionStorage.removeItem('vigie-regles-ancre');
+  const cible = ancre && document.getElementById(ancre);
+  if (cible) {
+    cible.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    cible.classList.add('eclair');
+  }
 }
 
 // Une méthode par fluide ET par pas de relevé : ce que le moteur applique selon la finesse des données
@@ -134,7 +148,7 @@ function couverture(c) {
   if (!c || !(c.alertes.length || c.sans_regle.length)) return null;
   const ligne = (a) => h('li', {}, h('span', { class: 'chip ' + (a.niveau === 'sans_effet' ? 'g-Critique' : 'g-Attente') },
     a.niveau === 'sans_effet' ? 'sans effet' : 'partielle'), ' ', a.texte);
-  return h('section', { class: 'carte' },
+  return h('section', { class: 'carte', id: 'couverture' },
     h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('alerte', 'h2', {}, 'Couverture des règles'),
       h('span', { class: 'doux petit' }, 'Une règle ne juge un compteur que s\'il est relevé assez finement pour elle. '
         + `${c.sans_effet} règle(s) sans effet, ${c.partielles} partielle(s), ${c.compteurs_sans_regle} compteur(s) sans règle.`))),
@@ -221,7 +235,9 @@ function blocRegle(x, r, ctx) {
     champs);
 }
 
-function blocCouts(c, ctx) {
+// Formulaire des tarifs et seuils de coût, et son enregistrement : sur la page Règles & coûts et dans le dialogue
+// ouvert depuis le bandeau « tarifs d'exemple » du tableau de bord
+function formCouts(c, ctx) {
   const lignes = c.tarifs.map((t) => h('tr', {},
     h('td', {}, h('span', { class: 'cellule-fluide' }, pastilleFluide(t.vecteur), t.libelle)),
     h('td', {}, h('span', { class: 'saisie-unite' }, h('input', { type: 'number', step: 'any', min: 0, name: 'chf_' + t.vecteur,
@@ -251,8 +267,23 @@ function blocCouts(c, ctx) {
       silence_max_heures: d.silence_max_heures, completude_min: d.completude_min === '' ? null : Number(d.completude_min) / 100,
     });
     await ctx.recharger();
+    return true;
   }, 'Coûts enregistrés. Les montants seront recalculés à la prochaine analyse.');
-  return h('section', { class: 'carte' },
+  return { form, enregistrer };
+}
+
+export async function ouvrirTarifs(ctx) {
+  const c = await api('GET', '/api/couts');
+  const { form, enregistrer } = formCouts(c, ctx);
+  dialogue('Tarifs de vos contrats', h('div', { class: 'pile' },
+    h('p', { class: 'doux' }, 'Saisissez le prix de chaque vecteur et passez sa source à « Tarif de mon contrat ». '
+      + 'Le bandeau disparaît quand plus aucun tarif n\'est une valeur d\'exemple.'), form),
+  [{ texte: 'Enregistrer les tarifs', classe: 'primaire', action: async () => !!(await enregistrer()) }], { large: true });
+}
+
+function blocCouts(c, ctx) {
+  const { form, enregistrer } = formCouts(c, ctx);
+  return h('section', { class: 'carte', id: 'couts' },
     h('div', { class: 'carte-tete' }, h('div', { class: 'titres' }, titreIcone('argent', 'h2', {}, 'Coûts de la dérive'),
       h('span', { class: 'doux petit' }, 'Eau et électricité : excès par jour × 365 (CHF/an). Chauffage et PAC : excès mesuré depuis le début '
         + 'de la dérive, sans année extrapolée. Tous : rythme par 30 jours (CHF/mois), base de la priorité. '

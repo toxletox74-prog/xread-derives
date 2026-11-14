@@ -125,6 +125,22 @@ export function enjeu(a) {
   return { principal: 'Dérive constatée : ' + fmt.chf(a.chf_mesure), precisions: p };
 }
 
+// Élément entier cliquable (ligne de tableau, tuile, entrée de liste), activable au clavier (Entrée, Espace).
+// Les liens, boutons et champs qu'il contient gardent leur propre action.
+export function cliquable(action, titre, classe = '') {
+  return { class: ('cliquable ' + classe).trim(), tabindex: '0', title: titre || null,
+    onclick: (ev) => { if (!ev.target.closest('a, button, input, select, textarea, label')) action(); },
+    onkeydown: (ev) => {
+      if ((ev.key === 'Enter' || ev.key === ' ') && ev.target === ev.currentTarget) { ev.preventDefault(); action(); }
+    } };
+}
+
+// Ouvre la page Alertes déjà filtrée (gravité, clé de fluide), depuis le tableau de bord
+export function allerAlertes(ctx, filtres) {
+  sessionStorage.setItem('vigie-alertes-filtres', JSON.stringify(filtres));
+  ctx.aller('#/alertes');
+}
+
 export const chip = (gravite) => h('span', { class: 'chip g-' + gravite }, gravite);
 export const chipStatut = (s) => h('span', { class: 'chip s-' + s }, STATUTS_BON[s] || s);
 
