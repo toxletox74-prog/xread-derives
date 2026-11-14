@@ -22,6 +22,7 @@
                                          rejoue la détection jour après jour sur la période et liste les épisodes
   python -m vigie reprendre-prestataires ancienne_base.db
                                          reprend la liste des prestataires d'une autre base Vigie dans vigie.db
+  python -m vigie mcp [--demo]           serveur MCP en lecture seule pour un assistant IA (stdio, voir docs/API.md)
 """
 import os
 import sys
@@ -192,6 +193,15 @@ def main(argv):
             creer_demo().close()
         port = next((int(a.split("=", 1)[1]) for a in argv if a.startswith("--port=")), 8765)
         serveur.lancer(BASE_DEMO if demo else BASE, port=port, ouvrir="--sans-navigateur" not in argv)
+    elif cmd == "mcp":
+        import contextlib
+
+        from . import mcp
+        demo = "--demo" in argv
+        if demo and not os.path.exists(BASE_DEMO):
+            with contextlib.redirect_stdout(sys.stderr):  # la sortie standard est réservée au protocole
+                creer_demo().close()
+        mcp.servir(BASE_DEMO if demo else BASE)
     elif cmd == "demo":
         cx = creer_demo(meteo_reelle="--meteo-fictive" not in argv, taille="standard" if "--petit" in argv else "grand")
         _afficher(service.analyser(cx))

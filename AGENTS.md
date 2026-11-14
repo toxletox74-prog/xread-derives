@@ -16,12 +16,13 @@ chaque fichier et les règles à respecter. La documentation fonctionnelle compl
 
 ```bash
 pip install -r requirements.txt
-python -m unittest discover -s tests        # 224 tests, ~90 s, doivent rester verts (2 ignorés hors DPAPI Windows)
+python -m unittest discover -s tests        # 281 tests, ~120 s, doivent rester verts (2 ignorés hors DPAPI Windows)
 python -m vigie interface                   # interface sur vigie.db → http://127.0.0.1:8765
 python -m vigie interface --demo            # interface sur la base d'exemple vigie_demo.db
 python -m vigie analyser                    # détection sur vigie.db, écrit sorties/
 python -m vigie importer-patrimoine <classeur.xlsx> [--apercu]
 python -m vigie importer-courbes <fichier.csv|.xlsx> [...] [--apercu]
+python -m vigie mcp [--demo]                # serveur MCP en lecture seule (stdio) pour un assistant IA
 ```
 
 Toutes les sous-commandes sont listées dans la docstring de `vigie/__main__.py`.
@@ -42,7 +43,10 @@ xread-derives/
 ├── vigie/                     ─── APPLICATION ───
 │   ├── __main__.py            ligne de commande : interface, demo, analyser, importer-*, meteo, rejouer…
 │   ├── serveur.py             serveur HTTP local + API JSON (table `routes` dans Application.__init__)
+│   ├── acces.py               lecture seule sans identification, session par mot de passe (VIGIE_MOT_DE_PASSE)
+│   ├── planification.py       analyse automatique (toutes les N heures, après un relevé API)
 │   ├── service.py             enchaînement partagé CLI/web : référentiel → moteur → sorties → alertes → bons
+│   ├── mcp.py                 serveur MCP (stdio, JSON-RPC) : le moteur interrogé par un assistant IA, lecture seule
 │   │
 │   │   Détection (le cœur métier)
 │   ├── moteur.py              qualité → attendu → détecteurs → impact → priorisation → consignes
@@ -53,6 +57,9 @@ xread-derives/
 │   ├── calendrier.py          type de jour (ouvré, vacances, non ouvré) pour comparer des jours semblables
 │   ├── chiffrage.py           dérive constatée, rythme mensuel, projection (kWh, m³, CHF, CO₂)
 │   ├── rejeu.py               détection rejouée jour par jour sur une période passée
+│   ├── series.py              lecture des mesures et séries par compteur, préparées une fois puis tronquées
+│   ├── declarations.py        sourdines, travaux et vacance datés, changements déclarés par immeuble
+│   ├── recoupement.py         cause commune à plusieurs immeubles (alertes groupées les mêmes jours)
 │   │
 │   │   Données et imports
 │   ├── db.py                  SQLite (même modèle que sql/schema_timescaledb.sql), import CSV, référentiel
@@ -89,7 +96,7 @@ xread-derives/
 │   ├── commun.py              base d'exemple créée une fois puis copiée pour chaque test
 │   └── test_*.py              bons, chiffrage, connecteur, fluides, geo, historique, historique_fluides,
 │                              import_mesures, meteo, methodes_par_pas, onduleur, pac, parc, patrimoine,
-│                              rejeu, serveur, solaire (aucun accès réseau, aucun courriel réel)
+│                              mcp, rejeu, serveur, solaire (aucun accès réseau, aucun courriel réel)
 │
 ├── evaluation/                ─── CAMPAGNE D'ÉVALUATION ET DOCUMENTS PDF (hors application) ───
 │   ├── campagne.py · analyse.py · figures.py   simulation → métriques → figures
@@ -105,7 +112,7 @@ xread-derives/
 │   ├── referentiel.json       parc d'exemple et valeurs par défaut (paramètres, tarifs, facteurs CO₂)
 │   └── exemple_grand.json     grand exemple (24 adresses, 15 dérives)
 ├── sql/schema_timescaledb.sql schéma cible PostgreSQL + TimescaleDB (le prototype utilise SQLite)
-├── docs/                      PDF générés par evaluation/ (méthodes, évaluation, méthodes par pas de relevé)
+├── docs/                      API.md (API JSON et serveur MCP) ; PDF générés par evaluation/ (méthodes, évaluation…)
 ├── exemple de données fluides/  modèles et exemples de fichiers de relevés à importer (fictifs)
 └── donnees/                   jeux de données du lot communal, déposés localement (NON versionnés)
 ```
@@ -134,7 +141,8 @@ fichiers (CSV, .xlsx) / API fournisseur / MétéoSuisse
 | Nouvelle règle de détection | `regles.py` (textes, réglages, matrice) + `moteur.py` ou un module dédié (`complements.py`, `historique.py`, `solaire.py`) + tests |
 | Calcul des montants | `chiffrage.py` |
 | Nouveau format d'import | `courbes.py` / `patrimoine.py` / `db.py`, anomalies tracées dans la table `anomalie_import` |
-| Nouvelle route API | `serveur.py` (liste `self.routes`) + appel via `api()` de `web/outils.js` |
+| Nouvelle route API | `serveur.py` (liste `self.routes`) + appel via `api()` de `web/outils.js` + `docs/API.md` (un test vérifie que chaque route y figure) |
+| Nouvel outil MCP | `mcp.py` (liste `OUTILS`, lecture seule) + `docs/API.md` + `tests/test_mcp.py` |
 | Nouvel écran | `web/pages_*.js` + navigation dans `web/app.js` |
 | Schéma de base | `db.py` **et** `sql/schema_timescaledb.sql` (même modèle) |
 
@@ -165,7 +173,8 @@ Les numéros sont ceux cités dans les commentaires du code.
 - Servie sur `https://xread-derive.brochardbenjamin.com` (VPS Ubuntu 24.04, `root@195.35.24.97`).
 - Code dans `/var/www/xread-derive` (clone GitHub), venv `.venv`, service systemd `xread-derive` (utilisateur
   `xread`, port 127.0.0.1:8765), vhost nginx dédié qui réécrit `Host: 127.0.0.1` vers l'app.
-- Secrets éventuels dans `/etc/xread-derive.env` (`VIGIE_SMTP_MOT_DE_PASSE`, `VIGIE_API_CLE`).
+- Secrets éventuels dans `/etc/xread-derive.env` (`VIGIE_MOT_DE_PASSE` : mot de passe des écritures, sans lui l'interface publiée reste en lecture seule ;
+  `VIGIE_SMTP_MOT_DE_PASSE`, `VIGIE_API_CLE`).
 - Redéployer : `git push` puis `./deploy.sh` (pull, dépendances, redémarrage, test de santé). La base `vigie.db`
   du serveur n'est jamais écrasée.
 - Le VPS héberge d'autres services (technistargets, etc.) : ne jamais modifier leurs vhosts, conteneurs ou services.
