@@ -1,0 +1,51 @@
+{
+ "evaluations": [
+  {
+   "commande": "python -m vigie evaluer",
+   "code": 0,
+   "precision": 100,
+   "rappel": 100,
+   "resume": "Exemple standard · météo fictive · dérives injectées : 6 · alertes levées : 6",
+   "fausses": [],
+   "manquees": [],
+   "duree_s": 4
+  },
+  {
+   "commande": "python -m vigie evaluer --meteo-reelle",
+   "code": 0,
+   "precision": 100,
+   "rappel": 100,
+   "resume": "Exemple standard · météo réelle · dérives injectées : 6 · alertes levées : 6",
+   "fausses": [],
+   "manquees": [],
+   "duree_s": 6
+  },
+  {
+   "commande": "python -m vigie evaluer --grand",
+   "code": 0,
+   "precision": 100,
+   "rappel": 100,
+   "resume": "Exemple grand · météo fictive · dérives injectées : 11 · alertes levées : 11",
+   "fausses": [],
+   "manquees": [],
+   "duree_s": 17
+  },
+  {
+   "commande": "python -m vigie evaluer --grand --meteo-reelle",
+   "code": 0,
+   "precision": 100,
+   "rappel": 100,
+   "resume": "Exemple grand · météo réelle · dérives injectées : 11 · alertes levées : 11",
+   "fausses": [],
+   "manquees": [],
+   "duree_s": 19
+  }
+ ],
+ "tests": {
+  "code": 0,
+  "tests": 101,
+  "ok": true,
+  "duree_s": 81,
+  "fin": "OK"
+ }
+}

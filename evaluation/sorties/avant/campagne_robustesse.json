@@ -1,0 +1,11 @@
+{
+ "etiquette": "avant",
+ "moteur": "reference",
+ "rapide": false,
+ "scenarios": 2250,
+ "duree_s": 315,
+ "meteo_reelle": "2026-11-12T22:15:01+00:00",
+ "seulement": [
+  "robustesse"
+ ]
+}

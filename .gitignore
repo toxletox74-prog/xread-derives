@@ -1,0 +1,37 @@
+# Bases locales : relevés, réglages de messagerie, clé de connexion chiffrée (jamais dans le dépôt)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Résultats de la dernière analyse (régénérés à chaque analyse)
+/sorties/
+
+# Jeux de données : à déposer localement dans donnees/ (lot communal, CC BY 4.0, non redistribué ici)
+/donnees/*
+!/donnees/.gitkeep
+
+# Relevés de compteurs d'exemple : gardés sur le poste, non publiés (les modèles vides et le LISEZMOI le sont)
+/exemple de données fluides/releves_*
+
+# Journaux de campagne : ils contiennent le chemin du poste qui les a produits
+/evaluation/sorties/journal_*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Fichiers de verrou d'Excel et fichiers système
+~$*
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Secrets éventuels
+.env
+.env.*
+*.key
+*.pem

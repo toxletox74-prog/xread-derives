@@ -1,0 +1,442 @@
+{
+  "_commentaire": "Référentiel Vigie (exemple fictif). Les tarifs et facteurs CO2 sont des VALEURS D'EXEMPLE à remplacer par ceux des contrats et du référentiel retenu (ex. KBOB).",
+  "parametres": {
+    "heures_nuit": [
+      1,
+      5
+    ],
+    "persistance_min_jours": 3,
+    "enjeu_min_chf_mois": 8.22,
+    "completude_min": 0.9,
+    "silence_max_heures": 24,
+    "fenetre_analyse_jours": 30,
+    "gaz_pcs_kwh_par_m3": 10.5,
+    "dj16_annuel_normal": 2122.0,
+    "dj16_nuit_annuel_normal": 761.3,
+    "rayonnement_annuel_normal_kwh_m2": 1385.9
+  },
+  "tarifs": {
+    "electricite": {
+      "chf_par_unite": 0.27,
+      "unite": "kWh",
+      "_statut": "EXEMPLE"
+    },
+    "chaleur": {
+      "chf_par_unite": 0.12,
+      "unite": "kWh",
+      "_statut": "EXEMPLE"
+    },
+    "eau": {
+      "chf_par_unite": 4.3,
+      "unite": "m3",
+      "_statut": "EXEMPLE"
+    },
+    "cad": {
+      "chf_par_unite": 0.15,
+      "unite": "kWh",
+      "_statut": "EXEMPLE"
+    },
+    "gaz": {
+      "chf_par_unite": 0.12,
+      "unite": "kWh",
+      "_statut": "EXEMPLE"
+    },
+    "solaire": {
+      "chf_par_unite": 0.2,
+      "unite": "kWh",
+      "_statut": "EXEMPLE"
+    }
+  },
+  "facteurs_co2_kg_par_kwh": {
+    "electricite": 0.1,
+    "chaleur": 0.23,
+    "cad": 0.1,
+    "gaz": 0.23,
+    "solaire": 0.1,
+    "_statut": "EXEMPLE — chaleur supposée produite au gaz ; CAD et gaz : valeurs d'EXEMPLE (gaz naturel, kWh PCS)"
+  },
+  "profils": {
+    "Habite": "Occupation normale. Eau quasi nulle la nuit, chauffage selon la météo.",
+    "Vide": "Aucun occupant. Eau ≈ 0, électricité = talon technique, chauffage hors-gel.",
+    "Partiel": "Occupation partielle : attendus pondérés par le taux d'occupation.",
+    "Travaux": "Alertes énergie suspendues, fuites et défauts critiques maintenus."
+  },
+  "immeubles": [
+    {
+      "id": "T8",
+      "nom": "Résidence Les Tilleuls",
+      "adresse": "Chemin des Tilleuls 8",
+      "npa": "1213 Onex",
+      "profil": "Habite",
+      "logements": 24,
+      "points": [
+        {
+          "id": "T8_ELEC",
+          "fluide": "electricite",
+          "libelle": "Électricité générale",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "DLMS · export HES GRD (CSV)"
+        },
+        {
+          "id": "T8_CHAL",
+          "fluide": "chaleur",
+          "libelle": "Chaleur (production totale)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        },
+        {
+          "id": "T8_PAC_ELEC",
+          "fluide": "pac_electricite",
+          "libelle": "PAC — électricité",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "Compteur élec. dédié PAC"
+        },
+        {
+          "id": "T8_PAC_CHAL",
+          "fluide": "pac_chaleur",
+          "libelle": "PAC — chaleur produite",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · compteur de chaleur PAC"
+        },
+        {
+          "id": "T8_EAU",
+          "fluide": "eau",
+          "libelle": "Eau froide générale",
+          "unite": "m3",
+          "nature": "index",
+          "pas_min": 60,
+          "source": "wM-Bus OMS · relais LoRaWAN"
+        },
+        {
+          "id": "T8_PV",
+          "fluide": "solaire",
+          "libelle": "Production solaire (onduleur)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "Modbus TCP · onduleur photovoltaïque",
+          "puissance_crete_kwc": 30.0,
+          "production_prevue_kwh_an": 31500,
+          "mise_en_service": 2019,
+          "degradation_pct_an": 0.5
+        }
+      ],
+      "lat": 46.18544,
+      "lon": 6.09949,
+      "geo_source": "exemple",
+      "geo_label": "Position approximative : centre d'Onex (adresse fictive)"
+    },
+    {
+      "id": "R41",
+      "nom": "Immeuble Rhône 41",
+      "adresse": "Rue du Rhône 41",
+      "npa": "1204 Genève",
+      "profil": "Vide",
+      "logements": 20,
+      "talon_horsgel_kwh_j": 200,
+      "points": [
+        {
+          "id": "R41_ELEC",
+          "fluide": "electricite",
+          "libelle": "Électricité générale",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "DLMS · export HES GRD (CSV)"
+        },
+        {
+          "id": "R41_CHAL",
+          "fluide": "chaleur",
+          "libelle": "Chaleur (production)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        },
+        {
+          "id": "R41_EAU",
+          "fluide": "eau",
+          "libelle": "Eau froide générale",
+          "unite": "m3",
+          "nature": "index",
+          "pas_min": 60,
+          "source": "wM-Bus OMS · relais LoRaWAN"
+        },
+        {
+          "id": "R41_ECS",
+          "fluide": "eau_chaude",
+          "libelle": "Eau chaude sanitaire",
+          "unite": "m3",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        }
+      ],
+      "lat": 46.203815,
+      "lon": 6.149499,
+      "geo_source": "geo.admin.ch",
+      "geo_label": "Rue du Rhône 41 1204 Genève"
+    },
+    {
+      "id": "OA",
+      "nom": "Ormeaux A",
+      "adresse": "Avenue des Ormeaux 15",
+      "npa": "1212 Grand-Lancy",
+      "profil": "Habite",
+      "logements": 36,
+      "points": [
+        {
+          "id": "OA_ELEC",
+          "fluide": "electricite",
+          "libelle": "Électricité des communs",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "DLMS · export HES GRD (CSV)"
+        },
+        {
+          "id": "OA_CHAL",
+          "fluide": "chaleur",
+          "libelle": "Chaleur (production)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        },
+        {
+          "id": "OA_EAU",
+          "fluide": "eau",
+          "libelle": "Eau froide générale",
+          "unite": "m3",
+          "nature": "index",
+          "pas_min": 60,
+          "source": "wM-Bus OMS · relais LoRaWAN"
+        },
+        {
+          "id": "OA_PV",
+          "fluide": "solaire",
+          "libelle": "Production solaire (onduleur)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "Modbus TCP · onduleur photovoltaïque",
+          "puissance_crete_kwc": 45.0,
+          "production_prevue_kwh_an": 47250,
+          "mise_en_service": 2016,
+          "degradation_pct_an": 0.5
+        }
+      ],
+      "lat": 46.18501,
+      "lon": 6.11925,
+      "geo_source": "exemple",
+      "geo_label": "Position approximative : centre de Lancy (adresse fictive)"
+    },
+    {
+      "id": "OB",
+      "nom": "Ormeaux B",
+      "adresse": "Avenue des Ormeaux 15",
+      "npa": "1212 Grand-Lancy",
+      "profil": "Habite",
+      "logements": 30,
+      "points": [
+        {
+          "id": "OB_ELEC",
+          "fluide": "electricite",
+          "libelle": "Électricité des communs",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "DLMS · export HES GRD (CSV)"
+        },
+        {
+          "id": "OB_CHAL",
+          "fluide": "chaleur",
+          "libelle": "Chaleur (production)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        },
+        {
+          "id": "OB_EAU",
+          "fluide": "eau",
+          "libelle": "Eau froide générale",
+          "unite": "m3",
+          "nature": "index",
+          "pas_min": 60,
+          "source": "wM-Bus OMS · relais LoRaWAN"
+        }
+      ],
+      "lat": 46.18501,
+      "lon": 6.11925,
+      "geo_source": "exemple",
+      "geo_label": "Position approximative : centre de Lancy (adresse fictive)"
+    },
+    {
+      "id": "VG",
+      "nom": "Les Vergers",
+      "adresse": "Route de Chêne 102",
+      "npa": "1224 Chêne-Bougeries",
+      "profil": "Partiel",
+      "taux_occupation": 0.4,
+      "logements": 28,
+      "points": [
+        {
+          "id": "VG_ELEC",
+          "fluide": "electricite",
+          "libelle": "Électricité générale",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "DLMS · export HES GRD (CSV)"
+        },
+        {
+          "id": "VG_CHAL",
+          "fluide": "chaleur",
+          "libelle": "Chaleur (production)",
+          "unite": "kWh",
+          "nature": "intervalle",
+          "pas_min": 60,
+          "source": "M-Bus · passerelle chaufferie"
+        },
+        {
+          "id": "VG_EAU",
+          "fluide": "eau",
+          "libelle": "Eau froide générale",
+          "unite": "m3",
+          "nature": "index",
+          "pas_min": 60,
+          "source": "wM-Bus OMS · relais LoRaWAN"
+        }
+      ],
+      "lat": 46.198639,
+      "lon": 6.180411,
+      "geo_source": "geo.admin.ch",
+      "geo_label": "Route de Chêne 102 1224 Chêne-Bougeries"
+    }
+  ],
+  "meteo": {
+    "id": "METEO_TEXT",
+    "fluide": "meteo",
+    "libelle": "Température extérieure",
+    "unite": "degC",
+    "nature": "instantane",
+    "pas_min": 60,
+    "source": "Open data MétéoSuisse"
+  },
+  "rayonnement": {
+    "id": "RAYON_FICTIF",
+    "fluide": "rayonnement",
+    "libelle": "Rayonnement solaire global",
+    "unite": "W/m2",
+    "nature": "instantane",
+    "pas_min": 60,
+    "source": "Open data MétéoSuisse"
+  },
+  "_commentaire_gaz": "gaz_pcs_kwh_par_m3 = pouvoir calorifique supérieur de conversion m³ -> kWh, valeur d'EXEMPLE (à remplacer par le PCS facturé par le distributeur, ex. SIG) ; les compteurs de gaz en kWh ne sont pas convertis.",
+  "climat_reference": {
+    "_statut": "MESURÉ — données réelles MétéoSuisse",
+    "usage": "PROJECTION seulement (« si rien n'est fait, sur 12 mois, au climat normal ») du chauffage, du CAD, du gaz et des PAC. Jamais un déclencheur d'alerte, jamais dans le score ni la gravité. La dérive constatée (mesurée) reste la base des actions.",
+    "source": "MétéoSuisse, données ouvertes SwissMetNet, station Genève-Cointrin (GVE), colonne tre200h0 (température de l'air à 2 m, moyenne horaire, UTC), fichiers ogd-smn_gve_h_historical_2010-2019 et 2020-2029 (data.geo.admin.ch/ch.meteoschweiz.ogd-smn/gve)",
+    "definition": "degrés-jours base 16 °C = somme sur l'année des moyennes journalières de max(0 ; 16 − T horaire) ; part de nuit = heures de fin d'intervalle 22 h-5 h UTC",
+    "periode": "2016-2025",
+    "annees_retenues": 10,
+    "dj16_min_max_sur_la_periode": [
+      1947.5,
+      2346.7
+    ],
+    "par_annee": {
+      "2010": {
+        "dj16": 2621.3,
+        "dj16_nuit": 927.5
+      },
+      "2011": {
+        "dj16": 2164.9,
+        "dj16_nuit": 818.2
+      },
+      "2012": {
+        "dj16": 2364.3,
+        "dj16_nuit": 846.1
+      },
+      "2013": {
+        "dj16": 2566.8,
+        "dj16_nuit": 886.0
+      },
+      "2014": {
+        "dj16": 1957.7,
+        "dj16_nuit": 732.7
+      },
+      "2015": {
+        "dj16": 2232.7,
+        "dj16_nuit": 814.4
+      },
+      "2016": {
+        "dj16": 2320.1,
+        "dj16_nuit": 834.4
+      },
+      "2017": {
+        "dj16": 2346.7,
+        "dj16_nuit": 870.4
+      },
+      "2018": {
+        "dj16": 2041.7,
+        "dj16_nuit": 709.7
+      },
+      "2019": {
+        "dj16": 2142.2,
+        "dj16_nuit": 771.3
+      },
+      "2020": {
+        "dj16": 2036.5,
+        "dj16_nuit": 731.2
+      },
+      "2021": {
+        "dj16": 2316.6,
+        "dj16_nuit": 821.4
+      },
+      "2022": {
+        "dj16": 1947.5,
+        "dj16_nuit": 704.4
+      },
+      "2023": {
+        "dj16": 1962.8,
+        "dj16_nuit": 698.7
+      },
+      "2024": {
+        "dj16": 2007.6,
+        "dj16_nuit": 716.1
+      },
+      "2025": {
+        "dj16": 2098.7,
+        "dj16_nuit": 755.7
+      }
+    },
+    "calcule_par": "python -m evaluation.climat_gve --ecrire",
+    "rayonnement_global_kwh_m2": {
+      "source": "MétéoSuisse SwissMetNet GVE, colonne gre000h0 (rayonnement global, moyenne horaire W/m²), mêmes fichiers",
+      "normal_2016_2025": 1385.9,
+      "par_annee": {
+        "2016": 1322.1,
+        "2017": 1420.9,
+        "2018": 1400.8,
+        "2019": 1419.1,
+        "2020": 1427.6,
+        "2021": 1382.7,
+        "2022": 1474.1,
+        "2023": 1349.6,
+        "2024": 1280.6,
+        "2025": 1381.4
+      },
+      "usage": "Référence nominale du solaire sans historique ; jamais un déclencheur à lui seul."
+    }
+  },
+  "_commentaire_solaire": "Solaire : tarif = valeur d'EXEMPLE d'un kWh solaire perdu (autoconsommation évitée et reprise du surplus) ; CO2 = électricité du réseau achetée à la place (EXEMPLE). rayonnement_annuel_normal_kwh_m2 = rayonnement global moyen MESURÉ à Genève-Cointrin 2016-2025 (MétéoSuisse gre000h0, voir climat_reference) : référence nominale d'une installation sans historique (production prévue × rayonnement du jour ÷ rayonnement annuel normal)."
+}

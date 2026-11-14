@@ -1,0 +1,875 @@
+{
+ "balayage": {},
+ "delai": {},
+ "delai_sain": {},
+ "generateur": {},
+ "sain": {},
+ "robustesse": {},
+ "qualite": {},
+ "pas": {},
+ "chiffrage": {
+  "eau_nuit|reelle": {
+   "det": "eau_nuit",
+   "cause": "eau_nuit",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 525.6,
+   "verite_annuelle_min_max": [
+    525.6,
+    525.6
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "q1": 0.0,
+    "q3": 0.0
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 12.166236003455346,
+    "min": 12.166236003450864,
+    "max": 12.16623600345714,
+    "q1": 12.166236003453298,
+    "q3": 12.16623600345637
+   },
+   "par_mois": {
+    "2025-10": 0.0,
+    "2025-11": 0.0,
+    "2025-12": 0.0,
+    "2026-01": 0.0,
+    "2026-02": 0.0,
+    "2026-03": 0.0,
+    "2026-04": 0.0
+   },
+   "par_mois_proj": {}
+  },
+  "eau_nuit|fictive": {
+   "det": "eau_nuit",
+   "cause": "eau_nuit",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 525.6,
+   "verite_annuelle_min_max": [
+    525.6,
+    525.6
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "q1": 0.0,
+    "q3": 0.0
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 12.166236003455346,
+    "min": 12.166236003450864,
+    "max": 12.16623600345714,
+    "q1": 12.166236003453585,
+    "q3": 12.166236003456339
+   },
+   "par_mois": {
+    "2026-11": 0.0
+   },
+   "par_mois_proj": {}
+  },
+  "eau_vide|reelle": {
+   "det": "eau_vide",
+   "cause": "eau_vide",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 73.0,
+   "verite_annuelle_min_max": [
+    73.0,
+    73.0
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.010958904109589107,
+    "min": -0.017808219178082174,
+    "max": 0.004109589041095818,
+    "q1": -0.016438356164383605,
+    "q3": 0.00273972602739736
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 12.03488372093069,
+    "min": 11.937984496124937,
+    "max": 12.209302325582321,
+    "q1": 11.976744186046513,
+    "q3": 12.20930232558186
+   },
+   "par_mois": {
+    "2025-10": -0.010958904109589107,
+    "2025-11": -0.010958904109589107,
+    "2025-12": -0.010958904109589107,
+    "2026-01": -0.010958904109589107,
+    "2026-02": -0.010958904109589107,
+    "2026-03": -0.010958904109589107,
+    "2026-04": -0.010958904109589107
+   },
+   "par_mois_proj": {}
+  },
+  "eau_vide|fictive": {
+   "det": "eau_vide",
+   "cause": "eau_vide",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 73.0,
+   "verite_annuelle_min_max": [
+    73.0,
+    73.0
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.010958904109589107,
+    "min": -0.017808219178082174,
+    "max": 0.004109589041095818,
+    "q1": -0.01541095890410965,
+    "q3": -0.00034246575342458674
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 12.03488372093069,
+    "min": 11.937984496124937,
+    "max": 12.209302325582321,
+    "q1": 11.986434108527247,
+    "q3": 12.170542635659377
+   },
+   "par_mois": {
+    "2026-11": -0.010958904109589107
+   },
+   "par_mois_proj": {}
+  },
+  "chaleur_signature|reelle": {
+   "det": "chaleur_signature",
+   "cause": "chaleur_signature",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 68714.6712,
+   "verite_annuelle_min_max": [
+    63541.29119999999,
+    75136.0392
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.2528524243305991,
+    "min": -0.5914555143792931,
+    "max": 0.4578109485300135,
+    "q1": -0.562880830607831,
+    "q3": 0.021521296313792182
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 6.446183650095915,
+    "min": 4.447309213322523,
+    "max": 8.906564317115837,
+    "q1": 4.84547785718155,
+    "q3": 8.55085846128362
+   },
+   "par_mois": {
+    "2025-10": -0.5889014746533487,
+    "2025-11": -0.2528524243305991,
+    "2025-12": 0.024533753426444482,
+    "2026-01": 0.43250339819715244,
+    "2026-02": -0.016250841057651677,
+    "2026-03": -0.3149134067311087,
+    "2026-04": -0.568410945114149
+   },
+   "par_mois_proj": {}
+  },
+  "chaleur_signature|fictive": {
+   "det": "chaleur_signature",
+   "cause": "chaleur_signature",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 68714.6712,
+   "verite_annuelle_min_max": [
+    63541.29119999999,
+    75136.0392
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.29306217796469636,
+    "min": -0.2994072567140509,
+    "max": -0.28318073651788056,
+    "q1": -0.2947102976169083,
+    "q3": -0.290464479440018
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 5.190417665944551,
+    "min": 5.1371620133000455,
+    "max": 5.270232902884074,
+    "q1": 5.152803886867879,
+    "q3": 5.2252724757582145
+   },
+   "par_mois": {
+    "2026-11": -0.29306217796469636
+   },
+   "par_mois_proj": {}
+  },
+  "chaleur_vide|reelle": {
+   "det": "chaleur_vide",
+   "cause": "chaleur_vide",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 201563.03552,
+   "verite_annuelle_min_max": [
+    186387.78751999998,
+    220399.04832000003
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.28976560791179734,
+    "min": -0.7847621222409342,
+    "max": 0.38684654792402684,
+    "q1": -0.46905443389504275,
+    "q3": -0.0696719291003462
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 5.697716411295557,
+    "min": 2.3432203720642995,
+    "max": 10.427215245224723,
+    "q1": 4.523489142271879,
+    "q3": 8.43266569238295
+   },
+   "par_mois": {
+    "2025-10": -0.7819763932080714,
+    "2025-11": -0.28976560791179734,
+    "2025-12": -0.06868092398135361,
+    "2026-01": 0.3826840783629015,
+    "2026-02": -0.11332700691408998,
+    "2026-03": -0.3943606788562816,
+    "2026-04": -0.4718550466092921
+   },
+   "par_mois_proj": {}
+  },
+  "chaleur_vide|fictive": {
+   "det": "chaleur_vide",
+   "cause": "chaleur_vide",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 201563.03552,
+   "verite_annuelle_min_max": [
+    186387.78751999998,
+    220399.04832000003
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.3886453452038188,
+    "min": -0.39027014708852503,
+    "max": -0.37948443931035314,
+    "q1": -0.38979014836380654,
+    "q3": -0.3838614819448022
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 4.490556991878595,
+    "min": 4.48121523427062,
+    "max": 4.562041050548305,
+    "q1": 4.485214263598896,
+    "q3": 4.500150390232342
+   },
+   "par_mois": {
+    "2026-11": -0.3886453452038188
+   },
+   "par_mois_proj": {}
+  },
+  "elec_nuit|reelle": {
+   "det": "elec_nuit",
+   "cause": "elec_nuit",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 3737.600000000001,
+   "verite_annuelle_min_max": [
+    3737.600000000001,
+    3737.600000000001
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.003504922945205713,
+    "min": -0.009257277397260455,
+    "max": 0.010273972602739434,
+    "q1": -0.0068493150684934,
+    "q3": 0.006528253424657349
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 12.135245169133714,
+    "min": 12.06830754333097,
+    "max": 12.310305766821054,
+    "q1": 12.081871427948906,
+    "q3": 12.248503640954517
+   },
+   "par_mois": {
+    "2025-10": -0.003504922945205713,
+    "2025-11": -0.003504922945205713,
+    "2025-12": -0.003504922945205713,
+    "2026-01": -0.003504922945205713,
+    "2026-02": -0.003504922945205713,
+    "2026-03": -0.003504922945205713,
+    "2026-04": -0.003504922945205713
+   },
+   "par_mois_proj": {}
+  },
+  "elec_nuit|fictive": {
+   "det": "elec_nuit",
+   "cause": "elec_nuit",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 3737.600000000001,
+   "verite_annuelle_min_max": [
+    3737.600000000001,
+    3737.600000000001
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.003504922945205713,
+    "min": -0.009257277397260455,
+    "max": 0.010273972602739434,
+    "q1": -0.006180436643835857,
+    "q3": 0.004187178938355962
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 12.135245169133714,
+    "min": 12.06830754333097,
+    "max": 12.310305766821054,
+    "q1": 12.090875128790191,
+    "q3": 12.224528757454234
+   },
+   "par_mois": {
+    "2026-11": -0.003504922945205713
+   },
+   "par_mois_proj": {}
+  },
+  "pac_totale|reelle": {
+   "det": "pac_totale",
+   "cause": "pac_cop",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.2519315992650021,
+    "min": -0.6028118500563178,
+    "max": 0.5090927135535963,
+    "q1": -0.5278749087736102,
+    "q3": -0.02268242687359598
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 6.689514043752664,
+    "min": 4.4680611155380126,
+    "max": 9.655438195378204,
+    "q1": 4.739136294020614,
+    "q3": 9.108811412389313
+   },
+   "par_mois": {
+    "2025-10": -0.6011042716854667,
+    "2025-11": -0.2519315992650021,
+    "2025-12": -0.02125944489788678,
+    "2026-01": 0.5084693119261426,
+    "2026-02": -0.06423350056430605,
+    "2026-03": -0.2984292293474633,
+    "2026-04": -0.5285999519707573
+   },
+   "par_mois_proj": {}
+  },
+  "pac_totale|fictive": {
+   "det": "pac_totale",
+   "cause": "pac_cop",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.33193029071844676,
+    "min": -0.33613147559911216,
+    "max": -0.32512708165362736,
+    "q1": -0.3339698982169633,
+    "q3": -0.3275935837448567
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 4.955229052762249,
+    "min": 4.94070858468057,
+    "max": 5.015280823208574,
+    "q1": 4.950278103330267,
+    "q3": 4.964532774689527
+   },
+   "par_mois": {
+    "2026-11": -0.33193029071844676
+   },
+   "par_mois_proj": {}
+  },
+  "pac_chauffage|reelle": {
+   "det": "pac_chauffage",
+   "cause": "pac_cop",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.2469850428732509,
+    "min": -0.6096150591211371,
+    "max": 0.4883307289175336,
+    "q1": -0.5375240817898481,
+    "q3": -0.01278931409009365
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 6.7043526215469385,
+    "min": 4.391278665233089,
+    "max": 9.45445413778537,
+    "q1": 4.7689961311400175,
+    "q3": 8.981122047947155
+   },
+   "par_mois": {
+    "2025-10": -0.6081785249361354,
+    "2025-11": -0.2469850428732509,
+    "2025-12": -0.011718689555988593,
+    "2026-01": 0.4874362831042307,
+    "2026-02": -0.054367492199388634,
+    "2026-03": -0.2970469039996315,
+    "2026-04": -0.5381407073126555
+   },
+   "par_mois_proj": {}
+  },
+  "pac_chauffage|fictive": {
+   "det": "pac_chauffage",
+   "cause": "pac_cop",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.327024390954573,
+    "min": -0.33434258397250627,
+    "max": -0.2873977309833935,
+    "q1": -0.3315440527536114,
+    "q3": -0.3044938430058432
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 4.972554314575905,
+    "min": 4.951879918531972,
+    "max": 5.295772506910259,
+    "q1": 4.966441608591184,
+    "q3": 5.158708152257744
+   },
+   "par_mois": {
+    "2026-11": -0.327024390954573
+   },
+   "par_mois_proj": {}
+  },
+  "pac_ecs|reelle": {
+   "det": "pac_ecs",
+   "cause": "pac_cop",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.22909612660719175,
+    "min": -0.6282628991075745,
+    "max": 0.6028197930203121,
+    "q1": -0.5751314625764498,
+    "q3": 0.01323770385609313
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 6.475452196443587,
+    "min": 4.181256080575502,
+    "max": 9.723529351841941,
+    "q1": 4.888133306561174,
+    "q3": 8.636710993502136
+   },
+   "par_mois": {
+    "2025-10": -0.6252000998074766,
+    "2025-11": -0.22909612660719175,
+    "2025-12": 0.014789431820080856,
+    "2026-01": 0.5870992302410479,
+    "2026-02": -0.03302276256374986,
+    "2026-03": -0.32127825421456613,
+    "2026-04": -0.5761953110059085
+   },
+   "par_mois_proj": {}
+  },
+  "pac_ecs|fictive": {
+   "det": "pac_ecs",
+   "cause": "pac_cop",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.3661089625540536,
+    "min": -0.37060829603915335,
+    "max": -0.35296331954035876,
+    "q1": -0.36728800476249845,
+    "q3": -0.36478762214803795
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 4.694251882908075,
+    "min": 4.680544647927295,
+    "max": 4.808642003034727,
+    "q1": 4.6928926131234086,
+    "q3": 4.710383429009919
+   },
+   "par_mois": {
+    "2026-11": -0.3661089625540536
+   },
+   "par_mois_proj": {}
+  },
+  "pac_aucune|reelle": {
+   "det": "pac_aucune",
+   "cause": "pac_cop",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 42,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 42,
+    "mediane": -0.2293671707930412,
+    "min": -0.6222999270188883,
+    "max": 0.6091351225506025,
+    "q1": -0.5723058269389699,
+    "q3": 0.009842875428329734
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 42,
+    "mediane": 6.489343411937087,
+    "min": 4.24605608948441,
+    "max": 9.761285900962891,
+    "q1": 4.886862770032996,
+    "q3": 8.6874034136569
+   },
+   "par_mois": {
+    "2025-10": -0.619088053416573,
+    "2025-11": -0.2293671707930412,
+    "2025-12": 0.011469140543425849,
+    "2026-01": 0.5921135476792615,
+    "2026-02": -0.03590938314304576,
+    "2026-03": -0.3199501377039042,
+    "2026-04": -0.5733086904266126
+   },
+   "par_mois_proj": {}
+  },
+  "pac_aucune|fictive": {
+   "det": "pac_aucune",
+   "cause": "pac_cop",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 6,
+   "verite_annuelle": 36894.35347473938,
+   "verite_annuelle_min_max": [
+    34175.04682362578,
+    40799.23804825325
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": {
+    "n": 6,
+    "mediane": -0.3658514705774968,
+    "min": -0.37014752092320946,
+    "max": -0.3526922753545093,
+    "q1": -0.3669830800534179,
+    "q3": -0.36474018941551434
+   },
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": {
+    "n": 6,
+    "mediane": 4.696863737241069,
+    "min": 4.679805225392077,
+    "max": 4.810133980075694,
+    "q1": 4.695128720779577,
+    "q3": 4.713370254370398
+   },
+   "par_mois": {
+    "2026-11": -0.3658514705774968
+   },
+   "par_mois_proj": {}
+  },
+  "cad_signature|reelle": {
+   "det": "cad_signature",
+   "cause": "cad_signature",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 0,
+   "verite_annuelle": 68714.6712,
+   "verite_annuelle_min_max": [
+    63541.29119999999,
+    75136.0392
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "cad_signature|fictive": {
+   "det": "cad_signature",
+   "cause": "cad_signature",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 0,
+   "verite_annuelle": 68714.6712,
+   "verite_annuelle_min_max": [
+    63541.29119999999,
+    75136.0392
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "cad_vide|reelle": {
+   "det": "cad_vide",
+   "cause": "cad_vide",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 0,
+   "verite_annuelle": 201563.03552,
+   "verite_annuelle_min_max": [
+    186387.78751999998,
+    220399.04832000003
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "cad_vide|fictive": {
+   "det": "cad_vide",
+   "cause": "cad_vide",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 0,
+   "verite_annuelle": 201563.03552,
+   "verite_annuelle_min_max": [
+    186387.78751999998,
+    220399.04832000003
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "gaz_signature|reelle": {
+   "det": "gaz_signature",
+   "cause": "gaz_signature",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 0,
+   "verite_annuelle": 74689.85999999999,
+   "verite_annuelle_min_max": [
+    69066.6208695652,
+    81669.60782608695
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "gaz_signature|fictive": {
+   "det": "gaz_signature",
+   "cause": "gaz_signature",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 0,
+   "verite_annuelle": 74689.85999999999,
+   "verite_annuelle_min_max": [
+    69066.6208695652,
+    81669.60782608695
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "gaz_vide|reelle": {
+   "det": "gaz_vide",
+   "cause": "gaz_vide",
+   "meteo": "reelle",
+   "n": 42,
+   "detectees": 0,
+   "verite_annuelle": 219090.256,
+   "verite_annuelle_min_max": [
+    202595.42121739127,
+    239564.18295652175
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  },
+  "gaz_vide|fictive": {
+   "det": "gaz_vide",
+   "cause": "gaz_vide",
+   "meteo": "fictive",
+   "n": 6,
+   "detectees": 0,
+   "verite_annuelle": 219090.256,
+   "verite_annuelle_min_max": [
+    202595.42121739127,
+    239564.18295652175
+   ],
+   "ecart_mesure": null,
+   "ecart_annuel": null,
+   "ecart_proj": null,
+   "ecart_proj_annees": null,
+   "ecart_mois": null,
+   "ecart_base_score": null,
+   "par_mois": {},
+   "par_mois_proj": {}
+  }
+ },
+ "erreurs_execution": 0
+}

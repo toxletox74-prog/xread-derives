@@ -1,0 +1,9 @@
+{
+ "etiquette": "horaire",
+ "moteur": "actuel",
+ "rapide": false,
+ "seulement": null,
+ "scenarios": 9764,
+ "duree_s": 2384,
+ "meteo_reelle": "2026-11-12T22:15:01+00:00"
+}

@@ -1,0 +1,11 @@
+{
+ "etiquette": "horaire_avant",
+ "moteur": "reference",
+ "rapide": false,
+ "seulement": [
+  "chiffrage"
+ ],
+ "scenarios": 624,
+ "duree_s": 101,
+ "meteo_reelle": "2026-11-12T22:15:01+00:00"
+}

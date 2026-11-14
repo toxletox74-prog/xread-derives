@@ -1,0 +1,2946 @@
+{
+ "resume": {
+  "chaleur_signature|fictive|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": -0.0008285934321755229,
+   "min": -0.0055780065797279565,
+   "max": 0.00598312355981645
+  },
+  "chaleur_signature|fictive|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.011916402381453394,
+   "min": 0.00823018078624127,
+   "max": 0.017845387466330243
+  },
+  "chaleur_signature|reelle|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": -0.0009084280567085934,
+   "min": -0.010721594615109908,
+   "max": 0.013957023220816156
+  },
+  "chaleur_signature|reelle|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.03488959667364527,
+   "min": 0.02972715137344073,
+   "max": 0.04403168267574653
+  },
+  "pac_aucune|fictive|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.002562677503669042,
+   "min": -0.006126519692556065,
+   "max": 0.012610384946839304
+  },
+  "pac_aucune|fictive|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.10060068118873888,
+   "min": 0.0922932664916769,
+   "max": 0.11248496654377549
+  },
+  "pac_aucune|reelle|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": -0.00011200598069260881,
+   "min": -0.008338039208593884,
+   "max": 0.015367397573875508
+  },
+  "pac_aucune|reelle|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.04474560208746871,
+   "min": 0.03646918898069673,
+   "max": 0.05853605525175354
+  },
+  "pac_chauffage|fictive|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.0025855563083178267,
+   "min": 0.0005317567023572778,
+   "max": 0.003978117924456237
+  },
+  "pac_chauffage|fictive|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.0025855563083178267,
+   "min": 0.0005317567023572778,
+   "max": 0.003978117924456237
+  },
+  "pac_chauffage|reelle|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.0005296027936732506,
+   "min": -0.002317204271431228,
+   "max": 0.003914049192930813
+  },
+  "pac_chauffage|reelle|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.0005296027936732506,
+   "min": -0.002317204271431228,
+   "max": 0.003914049192930813
+  },
+  "pac_ecs|fictive|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.00020423543149084011,
+   "min": -0.008042403507755869,
+   "max": 0.009384461856161819
+  },
+  "pac_ecs|fictive|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.09826006940122849,
+   "min": 0.09054229846221373,
+   "max": 0.10952113503675576
+  },
+  "pac_ecs|reelle|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": -0.00082280378617825,
+   "min": -0.008560861045679768,
+   "max": 0.01356549278025243
+  },
+  "pac_ecs|reelle|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.04393528189078685,
+   "min": 0.03618626901577682,
+   "max": 0.056782145934949346
+  },
+  "pac_totale|fictive|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.016283906115616986,
+   "min": 0.013936478582565304,
+   "max": 0.01793222601532163
+  },
+  "pac_totale|fictive|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.016283906115616986,
+   "min": 0.013936478582565304,
+   "max": 0.01793222601532163
+  },
+  "pac_totale|reelle|apres": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.014199029508760485,
+   "min": 0.01155090908166767,
+   "max": 0.01674742070477131
+  },
+  "pac_totale|reelle|avant": {
+   "n": 20,
+   "sans_conclusion": 0,
+   "moyenne": 0.014199029508760485,
+   "min": 0.01155090908166767,
+   "max": 0.01674742070477131
+  }
+ },
+ "lignes": [
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.015151063825731281
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.0026669067846305516
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.01793222601532163
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.01793222601532163
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.0038266962629380785
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.0038266962629380785
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.10508808439517536
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.00633545094509258
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.10786897463331524
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 200,
+   "biais": 0.009095215725980488
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.04403168267574653
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.013957023220816156
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.01674742070477131
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.01674742070477131
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.003914049192930813
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.003914049192930813
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.056782145934949346
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.009402764589603319
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.05853605525175354
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 200,
+   "biais": 0.01086330732238161
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.010811060842028875
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": -0.00035910716339437876
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.015875981592485378
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.015875981592485378
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.00201927668241364
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.00201927668241364
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.0951104368006852
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": -0.0006062542224329892
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.09755555790703885
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 201,
+   "biais": 0.0016648997321428993
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": 0.03264083215030511
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": -0.0037512871709204365
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": 0.012048798314653109
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": 0.012048798314653109
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": -0.0021617429438843816
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": -0.0021617429438843816
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": 0.0364220906839694
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": -0.008560861045679768
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": 0.03671722975814795
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 201,
+   "biais": -0.008338039208593884
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.013368298546714952
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.0004937895233445566
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.0163579305077457
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.0163579305077457
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.003026193649249276
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.003026193649249276
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.10099695577781076
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.004864406603260152
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.10324564324605778
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 202,
+   "biais": 0.007139055969864527
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.03756655119567287
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": -0.0012734191746387458
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.014906699223246056
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.014906699223246056
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.0014752538438707052
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.0014752538438707052
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.04932706812040255
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.004522409626640744
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.05049203529101831
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 202,
+   "biais": 0.005577182364329802
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.010874114487885667
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": -0.002957414692214333
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.01612894419573241
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.01612894419573241
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.0025202729291180503
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.0025202729291180503
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.09418134631575703
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": -0.0012862020996597945
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.09572007394541782
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 203,
+   "biais": 0.0008196437061362971
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.03204655677091384
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": -0.001341805639651028
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.013974208523660714
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.013974208523660714
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.0004134773985939866
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.0004134773985939866
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.03764065430193697
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": -0.006404284151323769
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": 0.03795355710170423
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 203,
+   "biais": -0.006088986189083934
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.010136939814820778
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": -0.004559670359820744
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.016028298180156053
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.016028298180156053
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.0025899498539661003
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.0025899498539661003
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.09705294549520316
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": -0.0030914992179152945
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": 0.09897739914662451
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 204,
+   "biais": -0.0011846036805778226
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.03238721087964791
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": -0.002584509859291484
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.015540719440693351
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.015540719440693351
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.0018975475150462273
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.0018975475150462273
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.04639825054005531
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.002753256113416702
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.04722442085933509
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 204,
+   "biais": 0.0035679065884188788
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.00823018078624127
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": -0.004432220696685474
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.016085775320386464
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.016085775320386464
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.0025345550374082926
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.0025345550374082926
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.09498310859531656
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": -0.0019560543792985774
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 0.09705296304962396
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 205,
+   "biais": 7.03034271154479e-05
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": 0.02972715137344073
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": -0.006991650828881757
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": 0.01365206284652376
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": 0.01365206284652376
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": -0.0008175399496057612
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": -0.0008175399496057612
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": 0.03618626901577682
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": -0.008175180560184847
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": 0.03646918898069673
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 205,
+   "biais": -0.00791598455350262
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.010810116188793684
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": -0.003035015731710944
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.01567054934293144
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.01567054934293144
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.0020580594380636974
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.0020580594380636974
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.09547751290906614
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": -0.0010763401015743135
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.09798349686920904
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 206,
+   "biais": 0.00115481390353378
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": 0.0333167844264779
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": -0.0019074124836483408
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": 0.012210170394526543
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": 0.012210170394526543
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": -0.002317204271431228
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": -0.002317204271431228
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": 0.04190062743594547
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": -0.006015570901874767
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": 0.042797902108904884
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 206,
+   "biais": -0.005469926951464976
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.01407295417370058
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.00248985626981435
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.016060923121599124
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.016060923121599124
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.002565576966667482
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.002565576966667482
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.1034608464925324
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.0017301787455952233
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.10662291189853557
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 207,
+   "biais": 0.004388432569455647
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.04031418061305159
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.009834048341700541
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.014212842494957467
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.014212842494957467
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.0007431249251483862
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.0007431249251483862
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.05478294457546973
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.008604248057383579
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.05662326066466061
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 207,
+   "biais": 0.009999478819213481
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.017845387466330243
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.00598312355981645
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.017651436653637553
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.017651436653637553
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.003941780319392851
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.003941780319392851
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.10952113503675576
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.009384461856161819
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.11248496654377549
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 208,
+   "biais": 0.012610384946839304
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.039628325953797505
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.004046521085528942
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.014724171325802615
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.014724171325802615
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.0014959933934473035
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.0014959933934473035
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.05016631766258173
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.004873935526674034
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.051618301890866025
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 208,
+   "biais": 0.00610284919962556
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.01036956354665719
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": -0.00038449391891315354
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.01632773611510485
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.01632773611510485
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.002132836876527211
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.002132836876527211
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.09291065596504189
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": -0.0016555318027129395
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.09525847409201194
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 209,
+   "biais": 0.0006698960373701102
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 0.031685835809626584
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": -0.008391495567366625
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 0.013557462046671187
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 0.013557462046671187
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 9.094549877453062e-05
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 9.094549877453062e-05
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 0.04182709884221558
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": -0.0014922019207213033
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": 0.04235464453159521
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 209,
+   "biais": -0.0009128479531852474
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.01206239286519728
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": -0.0018784321113406444
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.016743247764318347
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.016743247764318347
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.0027229708370282157
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.0027229708370282157
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.09931834615500956
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": -0.0011839893148849479
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.10184227176291993
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 210,
+   "biais": 0.0011833831812801954
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.033814335250180516
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": -0.004472653750899558
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.014123693782932767
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.014123693782932767
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.0005545920932941151
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.0005545920932941151
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.03992166970909872
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": -0.005462497407340505
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": 0.040537149231214764
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 210,
+   "biais": -0.00501660442310603
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.01037707139945998
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": -0.0024240619737697644
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.016809344262623593
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.016809344262623593
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.0033435385391222816
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.0033435385391222816
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.10070543011660127
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": -0.0014832501708035295
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.10320913477195481
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 211,
+   "biais": 0.0006850817247538998
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.03111239023886969
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": -0.010721594615109908
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.014647310740038444
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.014647310740038444
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.0008086515910503689
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.0008086515910503689
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.04254751036025706
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": -0.0005788772429126121
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": 0.04308305118068856
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 211,
+   "biais": -4.20435673393893e-05
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.01164595115505751
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": -0.0011201337095765318
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.016067121561982978
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.016067121561982978
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.0018855105341153422
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.0018855105341153422
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.10620272253469043
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.0013865357799884848
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.10827172539024965
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 212,
+   "biais": 0.00414681022670238
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 0.03233098708114812
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": -0.00314256179775263
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 0.013745834698779769
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 0.013745834698779769
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 5.5807302137056425e-05
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 5.5807302137056425e-05
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 0.038776720971626766
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": -0.0059398461417226045
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": 0.03910655189312329
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 212,
+   "biais": -0.005712847179530245
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.013617244633883141
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.002242524907864807
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.016549929842444744
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.016549929842444744
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.003261999166946028
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.003261999166946028
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.09661779827468564
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.0013935900913033539
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.09899528566151417
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 213,
+   "biais": 0.003851266398444464
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.03557255258594716
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.004311241371262042
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.01564019975128561
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.01564019975128561
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.0025074113260958875
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.0025074113260958875
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.046848867270794514
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.00011844802420823974
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.04788928436240236
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 213,
+   "biais": 0.0009027841059374708
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.008760920124925242
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": -0.0055780065797279565
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.01562455959159803
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.01562455959159803
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.0012718387205574722
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.0012718387205574722
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.09062011918767077
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": -0.008042403507755869
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": 0.09248165582913925
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 214,
+   "biais": -0.006126519692556065
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.036259925328113285
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.0033420511479993475
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.014364819451263111
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.014364819451263111
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.0003807572919183322
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.0003807572919183322
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.043485486255082195
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": -0.00022977689142544833
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.044076463319915105
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 214,
+   "biais": 0.00034462311059035855
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.009682457948873235
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": -0.003714665878316592
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.01701410432310735
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.01701410432310735
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.002833113145019883
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.002833113145019883
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.1008263141518384
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": -0.0029989022466092585
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": 0.103143084247723
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 215,
+   "biais": -0.0007215368529079891
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.033156672474902615
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": -0.005438894409891537
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.014650835714916433
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.014650835714916433
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.000588156110383764
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.000588156110383764
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.04315586623765477
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": -0.003405406207483641
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": 0.04391257221206857
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 215,
+   "biais": -0.00296405886692086
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.012018755418509386
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": -0.0006478654505833736
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.01712121879241657
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.01712121879241657
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.003978117924456237
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.003978117924456237
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.1010913980345185
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.003679083549195772
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.10344446785152384
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 216,
+   "biais": 0.006044247657147839
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.032215242099663755
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": -0.008069812766720474
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.015222813361977394
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.015222813361977394
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.0010408659649352447
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.0010408659649352447
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.04122527404511622
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": -0.002930753856096313
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": 0.04167216500932547
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 216,
+   "biais": -0.0024821024360177635
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.014330304698373597
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.0022133462665079318
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.016617805984693312
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.016617805984693312
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.003153879260194614
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.003153879260194614
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.09913997884262926
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.00479299559686619
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.10220724598093955
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 217,
+   "biais": 0.007601466452074934
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.04031835655358784
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.003226248882286731
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.01577808270065084
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.01577808270065084
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.003157190592231185
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.003157190592231185
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.055073805519241015
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.01356549278025243
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.05671718559166128
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 217,
+   "biais": 0.015367397573875508
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.01327187988263212
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.0013260490195174945
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.015074510561488896
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.015074510561488896
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.0015132033208145046
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.0015132033208145046
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.09135395448136796
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": -0.0022081343141023835
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.09335502445552635
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 218,
+   "biais": 0.00010741374343448129
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.0365211347662413
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.0062364658344102875
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.01155090908166767
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.01155090908166767
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": -0.0022966939246801266
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": -0.0022966939246801266
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.0391575532940005
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": -0.0045647970457739495
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": 0.03975857773396774
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 218,
+   "biais": -0.003816209637914514
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.010891389823251885
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": -0.002896376708952708
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.013936478582565304
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.013936478582565304
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.0005317567023572778
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.0005317567023572778
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.09054229846221373
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": -0.0038934331598968752
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": 0.0922932664916769
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "fictive",
+   "graine": 219,
+   "biais": -0.0019461051028539789
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": 0.03314522524557062
+  },
+  {
+   "modele": "chaleur_signature",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": -0.005035062953403391
+  },
+  {
+   "modele": "pac_totale",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": 0.01268153557619156
+  },
+  {
+   "modele": "pac_totale",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": 0.01268153557619156
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": -0.0009385870767913973
+  },
+  {
+   "modele": "pac_chauffage",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": -0.0009385870767913973
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": 0.0370794170395623
+  },
+  {
+   "modele": "pac_ecs",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": -0.006536577069204519
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "avant",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": 0.0373724447763244
+  },
+  {
+   "modele": "pac_aucune",
+   "version": "apres",
+   "meteo": "reelle",
+   "graine": 219,
+   "biais": -0.0062059977315653825
+  }
+ ]
+}

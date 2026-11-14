@@ -1,0 +1,85 @@
+EXEMPLES DE RELEVÉS DE COMPTEURS POUR XREAD DÉRIVES (VIGIE)
+===========================================================
+
+Ces fichiers montrent le format attendu par Vigie pour importer les relevés des compteurs
+(menu Imports > 2. Relevés des compteurs). Toutes les valeurs sont FICTIVES : elles prolongent
+de 24 heures la base d'exemple (du 12.11.2026 08:00 au 13.11.2026 07:00, heure de Genève).
+
+
+1. LES TROIS COLONNES
+---------------------
+
+  ts        Date et heure du relevé (« ts » = timestamp, horodatage).
+  point_id  Code du compteur, tel qu'il est déclaré dans le parc (ex. G01_EAU).
+  valeur    Le nombre relevé : kWh, m³ ou °C selon le compteur.
+
+
+2. LA COLONNE ts EN DÉTAIL
+--------------------------
+
+  Format     AAAA-MM-JJTHH:MM:SSZ  ->  2026-11-12T07:00:00Z
+             Le « T » sépare la date de l'heure, le « Z » signifie « heure UTC ».
+
+  Fuseau     UTC (heure universelle), sans heure d'été. Genève = UTC + 1 h en hiver,
+             UTC + 2 h en été. On peut aussi écrire l'heure de Genève en indiquant le décalage :
+             2026-11-12T08:00:00+01:00 est exactement le même instant que 2026-11-12T07:00:00Z.
+             Sans « Z » ni décalage, l'heure est lue comme UTC.
+
+  Fin de     L'heure indiquée est la FIN de la période mesurée.
+  période    2026-11-12T07:00:00Z avec 4,4 kWh = 4,4 kWh consommés de 06:00 à 07:00 UTC,
+             soit de 07:00 à 08:00 à Genève en hiver.
+
+  Pas        Au maximum un relevé par heure et par compteur. Un relevé plus fin est accepté
+             et ramené à l'heure ; un relevé journalier (à minuit) est accepté aussi, mais la
+             fuite de nuit, l'électricité de nuit et la PAC ne sont alors pas surveillées.
+
+  Refusé     12.11.2026 07:00, 12/11/2026, 2026-11-12 seul : la ligne est rejetée et signalée
+             avec son numéro. Rien n'entre en base.
+
+
+3. INDEX OU CONSOMMATION ?
+--------------------------
+
+  Compteur « index » (eau, gaz…)      la valeur LUE sur le compteur, qui ne fait que croître.
+                                      Vigie calcule la consommation par différence.
+  Compteur « intervalle » (kWh…)      la consommation de la période (l'heure écoulée).
+
+  La nature de chaque compteur est déclarée dans le parc (feuille « Compteurs »).
+
+
+4. LES FICHIERS
+---------------
+
+  Dans le dépôt public, seuls ce LISEZMOI et les modèles vides sont fournis : les fichiers
+  releves_* décrits ci-dessous ne sont pas publiés.
+
+  releves_horaires.csv
+      Format de référence : séparateur virgule, point décimal, heure UTC « Z ».
+      7 compteurs × 24 heures : électricité, PAC (électricité et chaleur), eau froide (index),
+      chaufferie, chauffage à distance (CAD), gaz (index en m³).
+
+  releves_horaires_point-virgule_heure-locale.csv
+      Les mêmes relevés au format d'un export Excel suisse : séparateur point-virgule,
+      virgule décimale, heure de Genève avec décalage +01:00.
+
+  releves_horaires.xlsx
+      Les mêmes relevés en classeur Excel. Seule la feuille « mesures » est importée ;
+      les feuilles « compteurs » et « aide » sont là pour information.
+      Conseil : saisir ts comme du texte ISO. Une cellule au format date Excel est acceptée,
+      mais elle est alors lue comme heure UTC.
+
+  releves_journaliers_index.csv
+      Relève journalière des index (gaz et eau), une valeur à minuit UTC par jour, comme
+      les fournit souvent un distributeur.
+
+  modele_vide.csv / modele_vide.xlsx
+      Modèles vides à remplir avec vos propres relevés.
+
+
+5. POUR ESSAYER
+---------------
+
+  Les codes de compteurs (G01_..., G17_CAD, G19_GAZ, OB_CHAL) sont ceux du grand exemple.
+  Avec la base d'exemple chargée : Imports > déposer un fichier > « Lancer l'analyse ».
+  Les fichiers ne contiennent que des compteurs existants : 0 ligne rejetée attendue.
+  Importer deux fois le même fichier ne crée pas de doublon (la dernière valeur l'emporte).

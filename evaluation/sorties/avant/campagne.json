@@ -1,0 +1,10 @@
+{
+ "etiquette": "avant",
+ "moteur": "reference",
+ "rapide": false,
+ "seulement": null,
+ "scenarios": 5002,
+ "duree_s": 1472,
+ "meteo_reelle": "2026-11-12T22:15:01+00:00",
+ "note": "robustesse relancée seule après correction d'un défaut du script (lacunes METEO) : voir campagne_robustesse.json"
+}

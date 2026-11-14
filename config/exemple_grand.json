@@ -1,0 +1,1115 @@
+{
+ "_commentaire": "Grand exemple FICTIF : 20 immeubles supplémentaires à de vraies adresses genevoises (coordonnées du géocodeur fédéral, correspondance exacte), consommations simulées sur 12 mois. G01-G16 chauffés par PAC, G17-G18 par le chauffage à distance (CAD), G19-G20 au gaz (index en m³). Dérives injectées : G02 PAC (chaleur chauffage seule comptée), G05 fuite d'eau, G08 électricité de nuit, G18 CAD et G20 gaz (signature +18 % depuis 12 jours). G12 : compteur d'eau chaude à connecter. Solaire (photovoltaïque) sur G03, G06, G10, G14 et G17 : G06 perd une chaîne de modules (-25 % depuis 14 jours, panne), G03 s'encrasse (baisse progressive jusqu'à -22 % sur 35 jours), G14 a son onduleur à l'arrêt depuis 6 jours ; G10 (en travaux : règles d'énergie suspendues) est sain (décote normale de 0,5 %/an) ; G17 : onduleur qui décroche une heure en plein jour, deux jours de la dernière semaine (production à zéro entre deux relevés producteurs).",
+ "derives_attendues": [
+  "G02-pac_cop",
+  "G05-eau_nuit",
+  "G08-elec_nuit",
+  "G18-cad_signature",
+  "G20-gaz_signature",
+  "G06-solaire_panne",
+  "G03-solaire_degradation",
+  "G14-solaire_arret",
+  "G17-solaire_onduleur"
+ ],
+ "immeubles": [
+  {
+   "id": "G01",
+   "nom": "Résidence Carouge 50",
+   "adresse": "Rue de Carouge 50",
+   "npa": "1205 Genève",
+   "profil": "Habite",
+   "logements": 32,
+   "lat": 46.194191,
+   "lon": 6.143451,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue de Carouge 50 1205 Genève",
+   "points": [
+    {
+     "id": "G01_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G01_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G01_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G01_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": null
+   }
+  },
+  {
+   "id": "G02",
+   "nom": "Carl-Vogt 65",
+   "adresse": "Boulevard Carl-Vogt 65",
+   "npa": "1205 Genève",
+   "profil": "Habite",
+   "logements": 40,
+   "lat": 46.197803,
+   "lon": 6.136786,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Boulevard Carl-Vogt 65 1205 Genève",
+   "points": [
+    {
+     "id": "G02_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G02_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G02_PAC_CHAUF",
+     "fluide": "pac_chaleur_chauffage",
+     "libelle": "PAC — chaleur chauffage",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G02_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "chauffage",
+    "derive": "pac"
+   }
+  },
+  {
+   "id": "G03",
+   "nom": "Lyon 87",
+   "adresse": "Rue de Lyon 87",
+   "npa": "1203 Genève",
+   "profil": "Habite",
+   "logements": 28,
+   "lat": 46.208576,
+   "lon": 6.124381,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue de Lyon 87 1203 Genève",
+   "points": [
+    {
+     "id": "G03_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G03_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G03_PAC_ECS",
+     "fluide": "pac_chaleur_ecs",
+     "libelle": "PAC — chaleur eau chaude",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G03_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G03_PV",
+     "fluide": "solaire",
+     "libelle": "Production solaire (onduleur)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Modbus TCP · onduleur photovoltaïque",
+     "puissance_crete_kwc": 60.0,
+     "production_prevue_kwh_an": 63000,
+     "mise_en_service": 2017,
+     "degradation_pct_an": 0.5
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "ecs",
+    "derive": null,
+    "solaire": "degradation"
+   }
+  },
+  {
+   "id": "G04",
+   "nom": "Châtelaine 81",
+   "adresse": "Avenue de Châtelaine 81",
+   "npa": "1219 Châtelaine",
+   "profil": "Habite",
+   "logements": 45,
+   "lat": 46.210976,
+   "lon": 6.112507,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue de Châtelaine 81 1219 Châtelaine",
+   "points": [
+    {
+     "id": "G04_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G04_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G04_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "aucune",
+    "derive": null
+   }
+  },
+  {
+   "id": "G05",
+   "nom": "Wendt 30",
+   "adresse": "Avenue Wendt 30",
+   "npa": "1203 Genève",
+   "profil": "Habite",
+   "logements": 22,
+   "lat": 46.210712,
+   "lon": 6.127378,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue Wendt 30 1203 Genève",
+   "points": [
+    {
+     "id": "G05_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G05_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G05_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G05_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": "fuite"
+   }
+  },
+  {
+   "id": "G06",
+   "nom": "Petit-Lancy 30",
+   "adresse": "Avenue du Petit-Lancy 30",
+   "npa": "1213 Petit-Lancy",
+   "profil": "Partiel",
+   "logements": 26,
+   "lat": 46.192993,
+   "lon": 6.116709,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue du Petit-Lancy 30 1213 Petit-Lancy",
+   "points": [
+    {
+     "id": "G06_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G06_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G06_PAC_CHAUF",
+     "fluide": "pac_chaleur_chauffage",
+     "libelle": "PAC — chaleur chauffage",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G06_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G06_PV",
+     "fluide": "solaire",
+     "libelle": "Production solaire (onduleur)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Modbus TCP · onduleur photovoltaïque",
+     "puissance_crete_kwc": 80.0,
+     "production_prevue_kwh_an": 84000,
+     "mise_en_service": 2020,
+     "degradation_pct_an": 0.5
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "chauffage",
+    "derive": null,
+    "solaire": "panne"
+   },
+   "taux_occupation": 0.5
+  },
+  {
+   "id": "G07",
+   "nom": "Deux-Ponts 14",
+   "adresse": "Rue des Deux-Ponts 14",
+   "npa": "1205 Genève",
+   "profil": "Habite",
+   "logements": 18,
+   "lat": 46.201679,
+   "lon": 6.130289,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue des Deux-Ponts 14 1205 Genève",
+   "points": [
+    {
+     "id": "G07_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G07_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G07_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G07_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": null
+   }
+  },
+  {
+   "id": "G08",
+   "nom": "France 20",
+   "adresse": "Avenue de France 20",
+   "npa": "1202 Genève",
+   "profil": "Habite",
+   "logements": 60,
+   "lat": 46.22097,
+   "lon": 6.145421,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue de France 20 1202 Genève",
+   "points": [
+    {
+     "id": "G08_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G08_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G08_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G08_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": "elec_nuit"
+   }
+  },
+  {
+   "id": "G09",
+   "nom": "Grand-Pré 40",
+   "adresse": "Rue du Grand-Pré 40",
+   "npa": "1202 Genève",
+   "profil": "Habite",
+   "logements": 35,
+   "lat": 46.214874,
+   "lon": 6.135258,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue du Grand-Pré 40 1202 Genève",
+   "points": [
+    {
+     "id": "G09_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G09_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G09_PAC_ECS",
+     "fluide": "pac_chaleur_ecs",
+     "libelle": "PAC — chaleur eau chaude",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G09_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "ecs",
+    "derive": null
+   }
+  },
+  {
+   "id": "G10",
+   "nom": "Bâle 30",
+   "adresse": "Rue de Bâle 30",
+   "npa": "1201 Genève",
+   "profil": "Travaux",
+   "logements": 24,
+   "lat": 46.213516,
+   "lon": 6.149452,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue de Bâle 30 1201 Genève",
+   "points": [
+    {
+     "id": "G10_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G10_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G10_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G10_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G10_PV",
+     "fluide": "solaire",
+     "libelle": "Production solaire (onduleur)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Modbus TCP · onduleur photovoltaïque",
+     "puissance_crete_kwc": 50.0,
+     "production_prevue_kwh_an": 52500,
+     "mise_en_service": 2015,
+     "degradation_pct_an": 0.5
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": null,
+    "solaire": null
+   }
+  },
+  {
+   "id": "G11",
+   "nom": "Miremont 20",
+   "adresse": "Avenue de Miremont 20",
+   "npa": "1206 Genève",
+   "profil": "Habite",
+   "logements": 16,
+   "lat": 46.189575,
+   "lon": 6.156054,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue de Miremont 20 1206 Genève",
+   "points": [
+    {
+     "id": "G11_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G11_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G11_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "aucune",
+    "derive": null
+   }
+  },
+  {
+   "id": "G12",
+   "nom": "La Montagne 50",
+   "adresse": "Chemin de la Montagne 50",
+   "npa": "1224 Chêne-Bougeries",
+   "profil": "Habite",
+   "logements": 12,
+   "lat": 46.200924,
+   "lon": 6.194623,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Chemin de la Montagne 50 1224 Chêne-Bougeries",
+   "points": [
+    {
+     "id": "G12_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G12_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G12_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G12_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G12_ECS",
+     "fluide": "eau_chaude",
+     "libelle": "Eau chaude sanitaire",
+     "unite": "m3",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · à installer",
+     "etat": "a_connecter"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": null
+   }
+  },
+  {
+   "id": "G13",
+   "nom": "Jacques-Dalphin 30",
+   "adresse": "Rue Jacques-Dalphin 30",
+   "npa": "1227 Carouge",
+   "profil": "Habite",
+   "logements": 30,
+   "lat": 46.183571,
+   "lon": 6.13945,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue Jacques-Dalphin 30 1227 Carouge",
+   "points": [
+    {
+     "id": "G13_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G13_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G13_PAC_CHAUF",
+     "fluide": "pac_chaleur_chauffage",
+     "libelle": "PAC — chaleur chauffage",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G13_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "chauffage",
+    "derive": null
+   }
+  },
+  {
+   "id": "G14",
+   "nom": "Bel-Air 50",
+   "adresse": "Avenue de Bel-Air 50",
+   "npa": "1225 Chêne-Bourg",
+   "profil": "Habite",
+   "logements": 20,
+   "lat": 46.200081,
+   "lon": 6.197757,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue de Bel-Air 50 1225 Chêne-Bourg",
+   "points": [
+    {
+     "id": "G14_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G14_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G14_PAC_CHAL",
+     "fluide": "pac_chaleur",
+     "libelle": "PAC — chaleur produite (totale)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G14_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G14_PV",
+     "fluide": "solaire",
+     "libelle": "Production solaire (onduleur)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Modbus TCP · onduleur photovoltaïque",
+     "puissance_crete_kwc": 40.0,
+     "production_prevue_kwh_an": 42000,
+     "mise_en_service": 2021,
+     "degradation_pct_an": 0.5
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "totale",
+    "derive": null,
+    "solaire": "arret"
+   }
+  },
+  {
+   "id": "G15",
+   "nom": "Ferney 150",
+   "adresse": "Route de Ferney 150",
+   "npa": "1218 Le Grand-Saconnex",
+   "profil": "Habite",
+   "logements": 50,
+   "lat": 46.229462,
+   "lon": 6.127624,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Route de Ferney 150 1218 Le Grand-Saconnex",
+   "points": [
+    {
+     "id": "G15_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G15_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G15_PAC_ECS",
+     "fluide": "pac_chaleur_ecs",
+     "libelle": "PAC — chaleur eau chaude",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur PAC"
+    },
+    {
+     "id": "G15_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "ecs",
+    "derive": null
+   }
+  },
+  {
+   "id": "G16",
+   "nom": "Montchoisy 40",
+   "adresse": "Rue de Montchoisy 40",
+   "npa": "1207 Genève",
+   "profil": "Partiel",
+   "logements": 34,
+   "lat": 46.203819,
+   "lon": 6.16152,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue de Montchoisy 40 1207 Genève",
+   "points": [
+    {
+     "id": "G16_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G16_PAC_ELEC",
+     "fluide": "pac_electricite",
+     "libelle": "PAC — électricité",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Compteur élec. dédié PAC"
+    },
+    {
+     "id": "G16_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "pac_mesure": "aucune",
+    "derive": null
+   },
+   "taux_occupation": 0.7
+  },
+  {
+   "id": "G17",
+   "nom": "Lignon 40",
+   "adresse": "Avenue du Lignon 40",
+   "npa": "1219 Le Lignon",
+   "profil": "Habite",
+   "logements": 48,
+   "lat": 46.202644,
+   "lon": 6.096951,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue du Lignon 40 1219 Le Lignon",
+   "points": [
+    {
+     "id": "G17_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G17_CAD",
+     "fluide": "cad",
+     "libelle": "Chaleur livrée (CAD)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur de la sous-station"
+    },
+    {
+     "id": "G17_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    },
+    {
+     "id": "G17_PV",
+     "fluide": "solaire",
+     "libelle": "Production solaire (onduleur)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "Modbus TCP · onduleur photovoltaïque",
+     "puissance_crete_kwc": 70.0,
+     "production_prevue_kwh_an": 73500,
+     "mise_en_service": 2018,
+     "degradation_pct_an": 0.5
+    }
+   ],
+   "simulation": {
+    "chauffage": "cad",
+    "derive": null,
+    "solaire": "coupures"
+   }
+  },
+  {
+   "id": "G18",
+   "nom": "Vaudagne 13",
+   "adresse": "Avenue de Vaudagne 13",
+   "npa": "1217 Meyrin",
+   "profil": "Habite",
+   "logements": 36,
+   "lat": 46.230724,
+   "lon": 6.073104,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Avenue de Vaudagne 13 1217 Meyrin",
+   "points": [
+    {
+     "id": "G18_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G18_CAD",
+     "fluide": "cad",
+     "libelle": "Chaleur livrée (CAD)",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "M-Bus · compteur de chaleur de la sous-station"
+    },
+    {
+     "id": "G18_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "chauffage": "cad",
+    "derive": "signature"
+   }
+  },
+  {
+   "id": "G19",
+   "nom": "Vollandes 23",
+   "adresse": "Rue des Vollandes 23",
+   "npa": "1207 Genève",
+   "profil": "Habite",
+   "logements": 24,
+   "lat": 46.204491,
+   "lon": 6.161201,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue des Vollandes 23 1207 Genève",
+   "points": [
+    {
+     "id": "G19_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G19_GAZ",
+     "fluide": "gaz",
+     "libelle": "Gaz (chaudière)",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "Export du distributeur de gaz (CSV)"
+    },
+    {
+     "id": "G19_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "chauffage": "gaz",
+    "derive": null
+   }
+  },
+  {
+   "id": "G20",
+   "nom": "Servette 40",
+   "adresse": "Rue de la Servette 40",
+   "npa": "1202 Genève",
+   "profil": "Habite",
+   "logements": 30,
+   "lat": 46.211369,
+   "lon": 6.134892,
+   "geo_source": "geo.admin.ch",
+   "geo_label": "Rue de la Servette 40 1202 Genève",
+   "points": [
+    {
+     "id": "G20_ELEC",
+     "fluide": "electricite",
+     "libelle": "Électricité générale",
+     "unite": "kWh",
+     "nature": "intervalle",
+     "pas_min": 60,
+     "source": "DLMS · export HES GRD (CSV)"
+    },
+    {
+     "id": "G20_GAZ",
+     "fluide": "gaz",
+     "libelle": "Gaz (chaudière)",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "Export du distributeur de gaz (CSV)"
+    },
+    {
+     "id": "G20_EAU",
+     "fluide": "eau",
+     "libelle": "Eau froide générale",
+     "unite": "m3",
+     "nature": "index",
+     "pas_min": 60,
+     "source": "wM-Bus OMS · relais LoRaWAN"
+    }
+   ],
+   "simulation": {
+    "chauffage": "gaz",
+    "derive": "signature"
+   }
+  }
+ ]
+}
