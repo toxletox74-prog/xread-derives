@@ -5,7 +5,7 @@ import {
 } from './outils.js';
 import { carteParc } from './carte.js';
 import { MOT_DE_PASSE_MANQUANT, ouvrirTarifs } from './pages_reglages.js';
-import { icone, pastilleFluide, tagFluide, cleFluide, libelleFluide, titreIcone, etatVide } from './icones.js';
+import { icone, pastilleFluide, tagFluide, cleFluide, libelleFluide, titreIcone, etatVide, aideCalcul } from './icones.js';
 
 const GRAVITES = ['Critique', 'Élevée', 'Modérée', 'Données'];
 const boutonAnalyse = (ctx) => h('button', { type: 'button', class: 'primaire', onclick: () => tenter(() => ctx.analyser()) },
@@ -61,6 +61,7 @@ export async function pageTableau(main, ctx) {
   }
   const pert = k.pertinence;
   const vers = (hash) => () => ctx.aller(hash);
+  const aide = aidesKpi(k, alertes, e);
   vider(main,
     h('div', { class: 'entete-page' },
       h('div', { class: 'titres' }, h('h1', {}, 'Tableau de bord du parc'), h('p', { class: 'doux' }, sousTitre)),
@@ -68,21 +69,24 @@ export async function pageTableau(main, ctx) {
     bannieres,
     h('section', { class: 'grille-kpi', 'aria-label': 'Indicateurs clés' },
       kpi('alerte', 'Alertes ouvertes', fmt.n0(k.alertes), `dont ${k.critiques} critique(s) · ${k.donnees} problème(s) de données`,
-        k.critiques ? 'ton-crit' : 'ton-ok', repartitionGravite(alertes, ctx), vers('#/alertes')),
+        k.critiques ? 'ton-crit' : 'ton-ok', repartitionGravite(alertes, ctx), vers('#/alertes'), aide.alertes),
       kpi('argent', 'Rythme des dérives ouvertes', fmt.chf(k.chf_mois, 'CHF/mois'),
         (k.chf_mesure ? `dérives constatées ${fmt.chf(k.chf_mesure)} · ` : 'tous fluides · ')
-        + (e.tarifs_exemple ? 'tarifs d\'exemple, à remplacer' : 'aux conditions actuelles'), '', null, vers('#/alertes')),
+        + (e.tarifs_exemple ? 'tarifs d\'exemple, à remplacer' : 'aux conditions actuelles'), '', null, vers('#/alertes'), aide.rythme),
       kpi('courbe', "Projection si rien n'est fait", fmt.chf(k.chf_proj, 'CHF sur 12 mois'),
-        'hypothèses : climat normal de Genève, dérive constante — information, pas un déclencheur', '', null, vers('#/alertes')),
+        'hypothèses : climat normal de Genève, dérive constante — information, pas un déclencheur', '', null, vers('#/alertes'),
+        aide.projection),
       kpi('energie', 'Énergie et eau en dérive', '≈ ' + fmt.n1((k.kwh_mois || 0) / 1000) + ' MWh/mois',
-        k.m3_mois ? `et ≈ ${fmt.n0(k.m3_mois)} m³ d'eau par mois` : 'chaleur, PAC et électricité', '', null, vers('#/alertes')),
+        k.m3_mois ? `et ≈ ${fmt.n0(k.m3_mois)} m³ d'eau par mois` : 'chaleur, PAC et électricité', '', null, vers('#/alertes'),
+        aide.energie),
       kpi('co2', 'Émissions évitables', '≈ ' + fmt.n1(k.co2_t_mois) + ' t CO₂/mois', 'facteurs d\'émission par vecteur', 'ton-ok', null,
-        vers('#/regles')),
+        vers('#/regles'), aide.co2),
       kpi('bon', 'Bons de travaux en cours', fmt.n0(k.bons_ouverts),
         k.bons_brouillon ? `dont ${k.bons_brouillon} à valider` : 'aucun en attente de validation', k.bons_brouillon ? 'ton-elev' : '',
-        null, vers('#/bons')),
+        null, vers('#/bons'), aide.bons),
       kpi('pertinence', 'Pertinence des alertes', pert.taux === null ? '—' : fmt.pct(pert.taux),
-        pert.retours ? `${pert.pertinentes} pertinente(s) sur ${pert.retours} retour(s)` : 'donnez votre avis sur chaque alerte', '', null, vers('#/alertes'))),
+        pert.retours ? `${pert.pertinentes} pertinente(s) sur ${pert.retours} retour(s)` : 'donnez votre avis sur chaque alerte', '', null, vers('#/alertes'),
+        aide.pertinence)),
     carte,
     h('section', { class: 'carte', 'aria-labelledby': 't-alertes' },
       h('div', { class: 'carte-tete' }, h('div', { class: 'titres' },
@@ -110,10 +114,70 @@ function couvertureVue(c, marquer = false) {
   } catch { return false; }
 }
 
-function kpi(ico, lib, val, sous, ton = '', extra = null, action = null) {
+function kpi(ico, lib, val, sous, ton = '', extra = null, action = null, aide = null) {
   return h('div', action ? cliquable(action, 'Voir le détail', 'kpi') : { class: 'kpi' },
-    h('div', { class: 'kpi-tete' }, h('span', { class: 'kpi-ico ' + ton }, icone(ico)), h('span', { class: 'lib' }, lib)),
+    h('div', { class: 'kpi-tete' }, h('span', { class: 'kpi-ico ' + ton }, icone(ico)), h('span', { class: 'lib' }, lib), aide),
     h('span', { class: 'val' }, val), extra, h('span', { class: 'sous' }, sous));
+}
+
+// Répartition par fluide d'un montant déjà calculé par le moteur pour chaque alerte (simple addition, aucun recalcul)
+function parFluide(metier, cle, format) {
+  const somme = new Map();
+  metier.forEach((a) => {
+    if (a[cle]) somme.set(cleFluide(a.fluide), (somme.get(cleFluide(a.fluide)) || 0) + a[cle]);
+  });
+  if (!somme.size) return null;
+  return 'Par fluide : ' + [...somme].sort((x, y) => y[1] - x[1]).map(([c, v]) => `${libelleFluide(c)} ${format(v)}`).join(' · ');
+}
+
+// Bulles « comment ce chiffre est construit » des tuiles du tableau de bord (méthode : vigie/chiffrage.py, serveur.py)
+function aidesKpi(k, alertes, e) {
+  const metier = alertes.filter((a) => a.gravite !== 'Données');
+  const n = metier.length;
+  const sansProj = metier.filter((a) => a.chf_proj === null || a.chf_proj === undefined).length;
+  const p = k.pertinence;
+  return {
+    alertes: aideCalcul(
+      `${n} dérive(s) d'énergie ou d'eau + ${k.donnees} problème(s) de données (compteur muet, valeurs manquantes ou figées), `
+        + 'issus de la dernière analyse et encore ouverts.',
+      'Une seule alerte par fluide et par immeuble : la règle la plus fine l\'emporte. Une dérive n\'est levée qu\'après '
+        + 'persistance, par comparaison à une référence apprise sur une période antérieure.'),
+    rythme: aideCalcul(
+      `Somme du rythme mensuel des ${n} dérive(s) ouvertes (problèmes de données exclus).`,
+      'Rythme d\'une dérive = excès moyen par jour sur ses 30 derniers jours de dérive au plus × 30 jours × prix du kWh '
+        + 'ou du m³ de son vecteur (chaleur, CAD, gaz, électricité, eau).',
+      parFluide(metier, 'chf_mois', (v) => fmt.chf(v)),
+      k.chf_mesure ? `Dérives constatées ${fmt.chf(k.chf_mesure)} : excès réellement mesuré depuis le début de chaque dérive, `
+        + 'heure par heure, sans combler les heures manquantes.' : null,
+      e.tarifs_exemple ? 'Prix : tarifs d\'exemple tant que ceux de vos contrats ne sont pas saisis.' : 'Prix : tarifs de vos contrats.'),
+    projection: aideCalcul(
+      'Somme des coûts projetés sur 12 mois si aucune dérive n\'est corrigée.',
+      'Eau et électricité : excès par jour × 365 (dérive constante).',
+      'Chauffage, CAD, gaz et PAC : excès relatif constaté × consommation attendue d\'une année au climat normal de Genève '
+        + '(degrés-jours base 16 °C, MétéoSuisse Genève-Cointrin 2016-2025).',
+      parFluide(metier, 'chf_proj', (v) => fmt.chf(v)),
+      sansProj ? `${sansProj} dérive(s) sans projection calculable (climat normal non renseigné, dérive trop courte en hiver…) : `
+        + 'non comptée(s).' : null,
+      'Information seulement : la projection n\'entre ni dans le classement ni dans la gravité.'),
+    energie: aideCalcul(
+      `Somme, sur les ${n} dérive(s) ouvertes, de l'excès moyen par jour (30 derniers jours de dérive au plus) × 30 jours, `
+        + 'en kWh, affichée en MWh.',
+      parFluide(metier, 'kwh_mois', (v) => fmt.n1(v / 1000) + ' MWh'),
+      k.m3_mois ? `L'eau est comptée à part : ≈ ${fmt.n0(k.m3_mois)} m³ par mois.` : 'L\'eau, comptée en m³, n\'entre pas dans ce total.'),
+    co2: aideCalcul(
+      'Énergie en dérive de chaque alerte (kWh par mois) × facteur d\'émission de son vecteur (kg CO₂/kWh) ÷ 1000, '
+        + 'additionnée sur les dérives ouvertes. L\'eau n\'est pas comptée.',
+      parFluide(metier, 'co2_t_mois', (v) => fmt.n2(v) + ' t'),
+      'Facteurs réglables dans Règles & coûts.'),
+    bons: aideCalcul(
+      'Bons de travaux au statut brouillon, envoyé ou en cours.',
+      'Brouillon : préparé à partir d\'une alerte, à relire puis envoyer au prestataire. Les bons « Retour reçu », '
+        + '« Terminé » ou « Annulé » ne sont pas comptés.'),
+    pertinence: aideCalcul(
+      'Alertes jugées « Pertinente » ÷ alertes ayant reçu un avis (« Pertinente », « Déjà connue » ou « Fausse alerte »), '
+        + 'toutes alertes confondues, résolues comprises.',
+      p.retours ? `Ici : ${p.pertinentes} ÷ ${p.retours} = ${fmt.pct(p.taux)}.` : 'Aucun avis pour l\'instant : pas de taux.'),
+  };
 }
 
 // Nombre d'alertes ouvertes par gravité (comptage des alertes reçues du moteur)
@@ -196,6 +260,16 @@ function carteAlerte(a, rang, ctx) {
   const donnees = a.gravite === 'Données';
   const resolue = a.statut === 'resolue';
   const { principal, precisions: details } = enjeu(a);
+  // Détail du chiffrage et de la confiance (méthode : vigie/chiffrage.py, moteur._alerte_metier, moteur.URGENCE)
+  const aideAlerte = donnees || a.chf_mesure === null || a.chf_mesure === undefined ? null : aideCalcul(
+    `Dérive constatée : excès sur la référence réellement mesuré ${a.periode || ''}, heure par heure, sans combler les heures `
+      + 'manquantes, × prix du kWh ou du m³ du vecteur.',
+    `Rythme : excès moyen par jour sur ${a.jours_rythme || 'les derniers'} jours de dérive × 30.`,
+    a.chf_proj !== null && a.chf_proj !== undefined ? `Projection ${a.projection || ''} : estimation, hors classement.` : null,
+    `Confiance ${fmt.pct(a.confiance)} : 60 % de base, + jusqu'à 20 % selon la durée au-delà de la persistance minimale, `
+      + '+ 15 % × force de l\'écart, plafonnée à 97 %, puis réduite si moins de 97 % des données attendues sont présentes'
+      + (a.cause_commune ? ' ; abaissée ici car plusieurs immeubles dérivent les mêmes jours (cause commune probable).' : '.'),
+    'Classement : rythme × confiance × urgence (Critique × 3, Élevée × 2, Modérée × 1), × 1,5 si risque de sinistre.');
   const retours = h('div', { class: 'retours', role: 'group', 'aria-label': 'Votre avis sur cette alerte' },
     h('span', { class: 'doux petit' }, 'Votre avis :'),
     Object.entries(RETOURS).map(([cle, lib]) => h('button', {
@@ -234,7 +308,7 @@ function carteAlerte(a, rang, ctx) {
       h('p', { class: 'consigne' }, h('strong', {}, `Consigne — ${a.metier || a.prestataire}, sous ${a.delai} : `), a.consigne),
       retours),
     h('div', { class: 'impact' },
-      h('span', { class: 'chf' }, principal),
+      h('span', { class: 'chf' }, principal, aideAlerte ? ' ' : null, aideAlerte),
       details.length ? h('span', { class: 'doux petit' }, details.join(' · ')) : null,
       h('span', { class: 'doux petit' }, donnees ? 'Pas d\'alerte énergie tant que les données manquent'
         : 'Confiance ' + fmt.pct(a.confiance)),

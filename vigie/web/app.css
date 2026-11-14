@@ -121,6 +121,18 @@ main:focus { outline: none; }
 .kpi .lib { font-size: 12.5px; font-weight: 600; color: var(--doux); }
 .kpi .val { font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; }
 .kpi .sous { font-size: 12px; color: var(--doux); }
+/* bulle « comment ce chiffre est construit » (icones.js aideCalcul) */
+.kpi, .alerte .impact .chf { position: relative; }
+.aide-calcul { display: inline-flex; color: var(--doux); cursor: help; border-radius: 50%; flex: 0 0 auto; }
+.aide-calcul .ico { width: 15px; height: 15px; }
+.aide-calcul:hover, .aide-calcul:focus-visible { color: var(--bleu); }
+.kpi-tete .aide-calcul { margin-left: auto; }
+.bulle-calcul { display: none; position: absolute; z-index: 30; top: 52px; left: 8px; right: 8px; padding: 10px 12px;
+  background: var(--carte); color: var(--texte-2); border: 1px solid var(--bord); border-radius: var(--rayon-s);
+  box-shadow: var(--ombre-haute); font-size: 12.5px; line-height: 1.45; font-weight: 400; text-align: left; cursor: auto;
+  flex-direction: column; gap: 6px; }
+.alerte .impact .bulle-calcul { top: calc(100% + 6px); left: auto; right: 0; width: min(340px, 85vw); }
+.aide-calcul:hover .bulle-calcul, .aide-calcul:focus .bulle-calcul, .aide-calcul:focus-within .bulle-calcul { display: flex; }
 .repartition { display: flex; flex-wrap: wrap; gap: 4px; }
 .colonnes { display: flex; flex-wrap: wrap; gap: var(--e5); align-items: flex-start; }
 .colonnes > .principale { flex: 999 1 620px; min-width: 0; }
@@ -349,13 +361,14 @@ details.avance[open] > summary { margin-bottom: 10px; }
   .nav a { padding: 0 8px; font-size: 13px; }
   .alerte { padding: var(--e4); display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--e3); }
   .alerte .impact { grid-column: 1 / -1; align-items: flex-start; text-align: left; }
+  .alerte .impact .bulle-calcul { left: 0; right: auto; }
   .regle { grid-template-columns: 1fr; padding: var(--e4); }
   .filtres .champ { width: 100%; }
   .carte-tete, .carte-corps { padding-left: var(--e4); padding-right: var(--e4); }
   .grille-immeubles { grid-template-columns: 1fr; }
 }
 @media print {
-  .bandeau, .actions, .toasts, button { display: none !important; }
+  .bandeau, .actions, .toasts, button, .aide-calcul { display: none !important; }
   body { background: #fff; }
   .carte, .kpi { box-shadow: none; }
 }

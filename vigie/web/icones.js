@@ -140,6 +140,16 @@ export function titreIcone(nom, balise, attrs, texte) {
   return h(balise, { ...attrs, class: ((attrs && attrs.class) || '') + ' titre-ico' }, h('span', { class: 'ico-titre' }, icone(nom)), texte);
 }
 
+// Bulle « comment ce chiffre est construit » : pictogramme i, détail au survol ou au focus clavier.
+// La bulle se place dans le premier ancêtre positionné (tuile, colonne d'impact) pour ne jamais sortir de l'écran.
+// Un clic sur la bulle ne déclenche pas l'action de l'élément cliquable qui la contient.
+export function aideCalcul(...lignes) {
+  const textes = lignes.flat().filter(Boolean);
+  return h('span', { class: 'aide-calcul', tabindex: '0', title: '', // title vide : masque l'infobulle native du parent
+    'aria-label': 'Calcul : ' + textes.join(' '), onclick: (ev) => ev.stopPropagation() },
+  icone('info'), h('span', { class: 'bulle-calcul', 'aria-hidden': 'true' }, textes.map((l) => h('span', {}, l))));
+}
+
 // État vide : pictogramme dans un cercle, message, actions éventuelles
 export function etatVide(nom, message, ...actions) {
   return h('div', { class: 'vide' }, h('span', { class: 'vide-ico' + (nom === 'ok' ? '' : ' ton-neutre') }, icone(nom)),
